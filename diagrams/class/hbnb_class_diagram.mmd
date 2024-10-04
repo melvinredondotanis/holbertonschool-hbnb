@@ -23,6 +23,31 @@ class User {
 class Place {
     - int owner_id
     + str title
+classDiagram
+class EntityModel {
+    - int id
+    - str created_date
+    - str updated_at
+    + bool create()
+    + bool update()
+    + bool delete()
+}
+
+class User {
+    + str first_name
+    + str last_name
+    + str email
+    - str password
+    + bool is_admin
+    + bool register()
+    + bool check_password(password: str)
+    + bool login()
+    + bool can_review(place_id: int)
+}
+
+class Place {
+    - int owner_id
+    + str title
     + str description
     + float price
     + float latitude
@@ -54,7 +79,7 @@ EntityModel <|-- Place
 EntityModel <|-- Review
 EntityModel <|-- Amenity
 
-User "1" ..> "*" Place : "owns"
+User "1" *-- "*" Place : "owns"
 Place "1" ..> "*" Review : "has"
 Place "1" ..> "*" Amenity : "has"
-User "1" ..> "*" Review : "creates"
+User "1" *--	 "*" Review : "creates"
