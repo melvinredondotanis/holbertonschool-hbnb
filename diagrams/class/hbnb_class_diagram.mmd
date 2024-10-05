@@ -1,8 +1,8 @@
 classDiagram
 class EntityModel {
-    - int id
-    - str created_date
-    - str updated_at
+    - UUID id
+    - datetime created_at
+    - datetime updated_at
     + bool create()
     + bool update()
     + bool delete()
@@ -21,7 +21,7 @@ class User {
 }
 
 class Place {
-    - int owner_id
+    - UUID owner_id
     + str title
     + str description
     + float price
@@ -33,8 +33,8 @@ class Place {
 }
 
 class Review {
-    - int user_id
-    - int place_id
+    - UUID user_id
+    - UUID place_id
     + float rating
     + str comment
     + list<Review> list()
@@ -49,12 +49,21 @@ class Amenity {
     + bool detach_from_place(place: Place)
 }
 
+class PlaceAmenity {
+    - UUID place_id
+    - UUID amenity_id
+    + list<Amenity> list()
+}
+
 EntityModel <|-- User
 EntityModel <|-- Place
 EntityModel <|-- Review
 EntityModel <|-- Amenity
+EntityModel <|-- PlaceAmenity
 
 User "1" *-- "*" Place : "owns"
 Place "1" ..> "*" Review : "has"
 Place "1" ..> "*" Amenity : "has"
-User "1" *--	 "*" Review : "creates"
+User "1" *-- "*" Review : "creates"
+Place "1" *-- "*" PlaceAmenity : "associates"
+Amenity "1" *-- "*" PlaceAmenity : "associates"

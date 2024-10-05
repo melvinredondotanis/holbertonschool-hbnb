@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant User
+    participant UserController
+    participant UserModel
+    participant UserAccess
+    participant Database
+
+    User->>UserController: Register (first_name, last_name, email, password)
+    UserController->>UserModel: register()
+    UserModel->>UserModel: Validate user details
+    UserModel->>UserModel: Hash password
+    UserModel->>UserAccess: Save user details
+    UserAccess->>Database: Insert user data
+    Database-->>UserAccess: Data saved
+    UserAccess-->>UserModel: User created
+    UserModel-->>UserController: Return success
+    UserController-->>User: Registration successful

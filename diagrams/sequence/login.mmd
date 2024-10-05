@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant User
+    participant UserController
+    participant UserModel
+    participant UserAccess
+    participant Database
+
+    User->>UserController: Login (email, password)
+    UserController->>UserModel: login()
+    UserModel->>UserAccess: Fetch user by email
+    UserAccess->>Database: Query user by email
+    Database-->>UserAccess: Return user data
+    UserAccess-->>UserModel: Return user
+    UserModel->>UserModel: Verify password
+    UserModel-->>UserController: Return authentication result
+    UserController-->>User: Login success/failure

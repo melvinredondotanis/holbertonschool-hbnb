@@ -1,0 +1,17 @@
+```mermaid
+sequenceDiagram
+    participant User
+    participant ReviewController
+    participant ReviewModel
+    participant ReviewAccess
+    participant Database
+
+    User->>ReviewController: Add review (place_id, rating, comment)
+    ReviewController->>ReviewModel: createReview()
+    ReviewModel->>ReviewAccess: Save review
+    ReviewAccess->>Database: Insert review data
+    Database-->>ReviewAccess: Data saved
+    ReviewAccess-->>ReviewModel: Review created
+    ReviewModel-->>ReviewController: Return success
+    ReviewController-->>User: Review added successfully
+```
