@@ -1,15 +1,12 @@
 sequenceDiagram
-    participant User
-    participant ReviewController
-    participant ReviewModel
-    participant ReviewAccess
-    participant Database
+participant User
+participant API
+participant BusinessLogic
+participant Database
 
-    User->>ReviewController: Add review (place_id, rating, comment)
-    ReviewController->>ReviewModel: createReview()
-    ReviewModel->>ReviewAccess: Save review
-    ReviewAccess->>Database: Insert review data
-    Database-->>ReviewAccess: Data saved
-    ReviewAccess-->>ReviewModel: Review created
-    ReviewModel-->>ReviewController: Return success
-    ReviewController-->>User: Review added successfully
+User->>API: POST | Add review (place_id, rating, comment)
+API->>BusinessLogic: createReview()
+BusinessLogic->>Database: Save Review
+Database-->>BusinessLogic: Confirm Save
+BusinessLogic-->>API: Return Response
+API-->>User: Return Success/Failure
