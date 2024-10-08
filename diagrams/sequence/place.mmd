@@ -1,15 +1,12 @@
 sequenceDiagram
-    participant User
-    participant PlaceController
-    participant PlaceModel
-    participant PlaceAccess
-    participant Database
+participant User
+participant API
+participant BusinessLogic
+participant Database
 
-    User->>PlaceController: Add new place (title, description, price, location)
-    PlaceController->>PlaceModel: createPlace()
-    PlaceModel->>PlaceAccess: Save place details
-    PlaceAccess->>Database: Insert place data
-    Database-->>PlaceAccess: Data saved
-    PlaceAccess-->>PlaceModel: Place created
-    PlaceModel-->>PlaceController: Return success
-    PlaceController-->>User: Place added successfully
+User->>API: POST | Add new place (title, description, price, location)
+API->>BusinessLogic: createPlace()
+BusinessLogic->>Database: Place saved
+Database-->>BusinessLogic: Confirm Save
+BusinessLogic-->>API: Return Response
+API-->>User: Return Success/Failure
