@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant User
+    participant API
+    participant BusinessLogic
+    participant Database
+
+    User->>API: GET | Register (first_name, last_name, email, password)
+    API->>BusinessLogic: register()
+    BusinessLogic->>BusinessLogic: Validate user details
+    BusinessLogic->>BusinessLogic: Hash password
+    BusinessLogic->>Database: Save user details
+    Database-->>BusinessLogic: User created
+    BusinessLogic-->>API: Return success (200)
+    API-->>User: Registration successful
