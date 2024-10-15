@@ -10,5 +10,5 @@ sequenceDiagram
     BusinessLogic->>BusinessLogic: Hash password
     BusinessLogic->>Database: Save user details
     Database-->>BusinessLogic: User created
-    BusinessLogic-->>API: Return success (200)
+    BusinessLogic-->>API: Return success
     API-->>User: Registration successful
