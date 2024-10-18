@@ -1,12 +1,6 @@
-import sys
-import os
-
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, parent_dir)
-
-from place import Place
-from user import User
-from review import Review
+from app.models.place import Place
+from app.models.user import User
+from app.models.review import Review
 
 def test_place_creation():
     owner = User(first_name="Alice", last_name="Smith", email="alice.smith@example.com")
