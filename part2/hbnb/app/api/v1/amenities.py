@@ -26,7 +26,8 @@ class AmenityList(Resource):
     def get(self):
         """Retrieve a list of all amenities"""
         # Placeholder for logic to return a list of all amenities
-        pass
+        amenities = facade.get_all_amenities()
+        return [{'id': amenity.id, 'name': amenity_model} for amenity in amenities], 200
 
 @api.route('/<amenity_id>')
 class AmenityResource(Resource):
