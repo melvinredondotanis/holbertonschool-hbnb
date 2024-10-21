@@ -39,12 +39,16 @@ class PlaceList(Resource):
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new place"""
-        pass
+        place_data = api.payload
+        try:
+            facade.create_place(place_data)
+        except Exception:
+            return {'message': 'An error occurred while creating the place'}, 400
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
         """Retrieve a list of all places"""
-        pass
+        return facade.get_all_places()
 
 
 @api.route('/<place_id>')
