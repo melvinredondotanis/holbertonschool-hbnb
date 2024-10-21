@@ -1,6 +1,7 @@
 from app.models.user import User
 from app.models.place import Place
 from app.models.amenity import Amenity
+
 from app.persistence.repository import InMemoryRepository
 
 
@@ -61,4 +62,3 @@ class HBnBFacade:
                 setattr(place, key, value)
             return self.place_repo.update(place)
         return None
-        
