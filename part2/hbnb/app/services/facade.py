@@ -44,8 +44,6 @@ class HBnBFacade:
         # Update an existing amenity
         amenity = self.amenity_repo.get(amenity_id)
         if amenity:
-            for key, value in amenity_data.items():
-                setattr(amenity, key, value)
-            return self.amenity_repo.update(amenity)
+            return self.amenity_repo.update(amenity_id, amenity_data)
         return None
     
