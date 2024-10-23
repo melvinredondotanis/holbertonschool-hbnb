@@ -60,5 +60,5 @@ class HBnBFacade:
         if place:
             for key, value in place_data.items():
                 setattr(place, key, value)
-            return self.place_repo.update(place)
+            return self.place_repo.update(place, place_data)
         return None
