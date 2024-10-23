@@ -1,6 +1,9 @@
+from flask import jsonify
+
 from flask_restx import Namespace, Resource, fields
 
-from app.services.facade import HBnBFacade
+from app.services import facade
+from app.models.place import Place
 
 
 api = Namespace('places', description='Place operations')
@@ -29,9 +32,6 @@ place_model = api.model('Place', {
 })
 
 
-facade = HBnBFacade()
-
-
 @api.route('/')
 class PlaceList(Resource):
     @api.expect(place_model)
@@ -42,13 +42,17 @@ class PlaceList(Resource):
         place_data = api.payload
         try:
             facade.create_place(place_data)
-        except Exception:
-            return {'message': 'An error occurred while creating the place'}, 400
+        except Exception as e:
+            return {'error': str(e)}, 400
+        return {'message': 'Place successfully created'}, 201
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
         """Retrieve a list of all places"""
-        return facade.get_all_places()
+        places = []
+        for place in facade.get_all_places():
+            places.append({"id": place.id, "title": place.title, "price": place.price}) # TEST
+        return places
 
 
 @api.route('/<place_id>')
@@ -57,7 +61,10 @@ class PlaceResource(Resource):
     @api.response(404, 'Place not found')
     def get(self, place_id):
         """Get place details by ID"""
-        pass
+        place = facade.get_place(place_id)
+        if place:
+            return facade.to_dict(), 200
+        return {'error': 'Place not found'}, 404
 
     @api.expect(place_model)
     @api.response(200, 'Place updated successfully')
@@ -65,4 +72,12 @@ class PlaceResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
         """Update a place's information"""
-        pass
+        place_data = api.payload
+        try:
+            place = Place(**place_data)
+            updated_place = facade.update_place(place_id, place.to_dict())
+            if updated_place:
+                return updated_place.to_dict(), 200
+            return {'error': 'Place not found'}, 404
+        except Exception as e:
+            return {'error': str(e)}, 400
