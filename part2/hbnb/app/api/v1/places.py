@@ -1,7 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 
 from app.services import facade
-from app.models.place import Place
 
 
 api = Namespace('places', description='Place operations')
@@ -72,6 +71,8 @@ class PlaceResource(Resource):
         """Get place details by ID"""
         place = facade.get_place(place_id)
         if place:
+            api.logger.info(f"Retrieving details for place ID: {facade.get_user(place.owner_id)}")
+            owner = facade.get_user(place.owner_id)
             return {'id': place.id,
                     'title': place.title,
                     'description': place.description,
@@ -79,10 +80,10 @@ class PlaceResource(Resource):
                     'latitude': place.latitude,
                     'longitude': place.longitude,
                     'owner_id': place.owner_id,
-                    'owner': {'id': place.owner.id,
-                              'first_name': place.owner.first_name,
-                              'last_name': place.owner.last_name,
-                              'email': place.owner.email
+                    'owner': {'id': owner.id,
+                              'first_name': owner.first_name,
+                              'last_name': owner.last_name,
+                              'email': owner.email
                               },
                               'amenities': [
                                   {'id': amenity.id,

@@ -1,9 +1,9 @@
 from app.models.base import BaseModel
-from app.persistence import facade
+from app.services import facade
 
 
 class Place(BaseModel):
-    def __init__(self, title, description, price, latitude, longitude, owner_id):
+    def __init__(self, title, description, price, latitude, longitude, owner_id, reviews=None, amenities=None):
         super().__init__()
         self.validate(title, description, price, latitude, longitude, owner_id)
         self.title = title
@@ -12,7 +12,6 @@ class Place(BaseModel):
         self.latitude = latitude
         self.longitude = longitude
         self.owner_id = owner_id
-        self.owner = facade.get_user(owner_id)
         self.reviews = []  # List to store related reviews
         self.amenities = [] # List to store related amenities
 
@@ -33,8 +32,8 @@ class Place(BaseModel):
         if not isinstance(longitude, (int, float)) or not (-180.0 <= longitude <= 180.0):
             raise ValueError("Longitude must be a number between -180.0 and 180.0")
 
-        if not isinstance(owner_id, str):
-            raise ValueError("Owner ID must be a string")
+        if not isinstance(owner_id, str) or not facade.get_user(owner_id):
+            raise ValueError("Owner ID must be a string or a valid user ID")
 
     def add_review(self, review):
         """Add a review to the place."""
