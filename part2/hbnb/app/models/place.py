@@ -32,7 +32,7 @@ class Place(BaseModel):
         if not isinstance(longitude, (int, float)) or not (-180.0 <= longitude <= 180.0):
             raise ValueError("Longitude must be a number between -180.0 and 180.0")
 
-        if not isinstance(owner_id, str) or not facade.get_user(owner_id):
+        if not isinstance(owner_id, str):
             raise ValueError("Owner ID must be a string or a valid user ID")
 
     def add_review(self, review):

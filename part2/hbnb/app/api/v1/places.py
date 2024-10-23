@@ -36,19 +36,20 @@ class PlaceList(Resource):
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new place"""
-        place_data = api.payload
+        place_data = api.payload    
         try:
             place = facade.create_place(place_data)
-        except Exception as e:
+            return {'id': place.id,
+                    'title': place.title,
+                    'description': place.description,
+                    'price': place.price,
+                    'latitude': place.latitude,
+                    'longitude': place.longitude,
+                    'owner_id': place.owner_id,
+                    }, 201
+        except ValueError as e:
             return {'error': str(e)}, 400
-        return {'id': place.id,
-                'title': place.title,
-                'description': place.description,
-                'price': place.price,
-                'latitude': place.latitude,
-                'longitude': place.longitude,
-                'owner_id': place.owner_id,
-                }, 201
+
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
@@ -70,9 +71,9 @@ class PlaceResource(Resource):
     def get(self, place_id):
         """Get place details by ID"""
         place = facade.get_place(place_id)
+        user_id = place.owner_id
         if place:
-            api.logger.info(f"Retrieving details for place ID: {facade.get_user(place.owner_id)}")
-            owner = facade.get_user(place.owner_id)
+            user = facade.get_user(user_id)
             return {'id': place.id,
                     'title': place.title,
                     'description': place.description,
@@ -80,10 +81,10 @@ class PlaceResource(Resource):
                     'latitude': place.latitude,
                     'longitude': place.longitude,
                     'owner_id': place.owner_id,
-                    'owner': {'id': owner.id,
-                              'first_name': owner.first_name,
-                              'last_name': owner.last_name,
-                              'email': owner.email
+                    'owner': {'id': place.owner_id,
+                              'first_name': user.first_name,
+                              'last_name': user.last_name,
+                              'email': user.email
                               },
                               'amenities': [
                                   {'id': amenity.id,
