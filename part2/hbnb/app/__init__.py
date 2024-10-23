@@ -15,4 +15,3 @@ def create_app():
     api.add_namespace(places_ns, path='/api/v1/places')
 
     return app
-

@@ -1,5 +1,3 @@
-from flask import jsonify
-
 from flask_restx import Namespace, Resource, fields
 
 from app.services import facade
@@ -41,18 +39,29 @@ class PlaceList(Resource):
         """Register a new place"""
         place_data = api.payload
         try:
-            facade.create_place(place_data)
+            place = facade.create_place(place_data)
         except Exception as e:
             return {'error': str(e)}, 400
-        return {'message': 'Place successfully created'}, 201
+        return {'id': place.id,
+                'title': place.title,
+                'description': place.description,
+                'price': place.price,
+                'latitude': place.latitude,
+                'longitude': place.longitude,
+                'owner_id': place.owner_id,
+                }, 201
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
         """Retrieve a list of all places"""
         places = []
         for place in facade.get_all_places():
-            places.append({"id": place.id, "title": place.title, "price": place.price}) # TEST
-        return places
+            places.append({'id': place.id,
+                           'title': place.title,
+                           'latitude': place.latitude,
+                           'longitude': place.longitude,
+                           })
+        return places, 200
 
 
 @api.route('/<place_id>')
@@ -63,7 +72,25 @@ class PlaceResource(Resource):
         """Get place details by ID"""
         place = facade.get_place(place_id)
         if place:
-            return facade.to_dict(), 200
+            return {'id': place.id,
+                    'title': place.title,
+                    'description': place.description,
+                    'price': place.price,
+                    'latitude': place.latitude,
+                    'longitude': place.longitude,
+                    'owner_id': place.owner_id,
+                    'owner': {'id': place.owner.id,
+                              'first_name': place.owner.first_name,
+                              'last_name': place.owner.last_name,
+                              'email': place.owner.email
+                              },
+                              'amenities': [
+                                  {'id': amenity.id,
+                                   'name': amenity.name
+                                   }
+                                   for amenity in place.amenities
+                                   ]
+                    }, 200
         return {'error': 'Place not found'}, 404
 
     @api.expect(place_model)
@@ -74,10 +101,12 @@ class PlaceResource(Resource):
         """Update a place's information"""
         place_data = api.payload
         try:
-            place = Place(**place_data)
-            updated_place = facade.update_place(place_id, place.to_dict())
+            updated_place = facade.update_place(place_id, place_data)
             if updated_place:
-                return updated_place.to_dict(), 200
-            return {'error': 'Place not found'}, 404
-        except Exception as e:
+                return {"title": updated_place.title,
+                        "description": updated_place.description,
+                        "price": updated_place.price
+                        }, 200
+        except ValueError as e:
             return {'error': str(e)}, 400
+        return {'error': 'Place not found'}, 404
