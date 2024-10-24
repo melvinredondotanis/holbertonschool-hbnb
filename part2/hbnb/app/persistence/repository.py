@@ -15,15 +15,15 @@ class Repository(ABC):
         pass
 
     @abstractmethod
+    def get_by_attribute(self, attr_name, attr_value):
+        pass
+
+    @abstractmethod
     def update(self, obj_id, data):
         pass
 
     @abstractmethod
     def delete(self, obj_id):
-        pass
-
-    @abstractmethod
-    def get_by_attribute(self, attr_name, attr_value):
         pass
 
 
@@ -40,6 +40,9 @@ class InMemoryRepository(Repository):
     def get_all(self):
         return list(self._storage.values())
 
+    def get_by_attribute(self, attr_name, attr_value):
+        return next((obj for obj in self._storage.values() if getattr(obj, attr_name) == attr_value), None)
+
     def update(self, obj_id, data):
         obj = self.get(obj_id)
         if obj:
@@ -48,6 +51,3 @@ class InMemoryRepository(Repository):
     def delete(self, obj_id):
         if obj_id in self._storage:
             del self._storage[obj_id]
-
-    def get_by_attribute(self, attr_name, attr_value):
-        return next((obj for obj in self._storage.values() if getattr(obj, attr_name) == attr_value), None)
