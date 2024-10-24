@@ -3,7 +3,7 @@ from app.services import facade
 
 
 class Place(BaseModel):
-    def __init__(self, title, description, price, latitude, longitude, owner_id, reviews=None, amenities=None):
+    def __init__(self, title, description, price, latitude, longitude, owner_id):
         super().__init__()
         self.validate(title, description, price, latitude, longitude, owner_id)
         self.title = title
