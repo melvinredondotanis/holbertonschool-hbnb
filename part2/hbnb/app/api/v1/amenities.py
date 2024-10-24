@@ -21,11 +21,12 @@ class AmenityList(Resource):
         """Register a new amenity"""
         data = api.payload
         
-        amenity_data = {"name": data['name']}
-        new_amenity = facade.create_amenity(amenity_data)
-        if new_amenity is None:
-            return {'message': 'Invalid input data'}, 400
-        return {'id': new_amenity.id, 'name': new_amenity.name}, 201
+        try:
+            new_amenity = facade.create_amenity(data)
+            return {'id': new_amenity.id, 'name': new_amenity.name}, 201
+        except ValueError as e:
+            return {'error': str(e)}, 400
+        
 
     @api.response(200, 'List of amenities retrieved successfully')
     def get(self):
@@ -52,7 +53,11 @@ class AmenityResource(Resource):
     def put(self, amenity_id):
         """Update an amenity's information"""
         data = api.payload
-        updated_amenity = facade.update_amenity(amenity_id, data)
-        if updated_amenity:
-            return {'id': updated_amenity.id, 'name': updated_amenity.name}, 200
-        return {'message': 'Amenity not found'}, 404
+        if facade.get_amenity(amenity_id) is None:
+            return {'message': 'Amenity not found'}, 404
+        
+        try:
+            facade.update_amenity(amenity_id, data)
+        except ValueError as e:
+            return {'message': str(e)}, 400
+        return {"message": "Amenity updated successfully"}, 200
