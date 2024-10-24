@@ -65,10 +65,9 @@ class HBnBFacade:
 
     def create_review(self, review_data):
         # Create a review, including validation for user_id, place_id, and rating
-        if all(key in review_data for key in ('user_id', 'place_id', 'rating')):
-            new_review = Review(**review_data)
-            self.review_repo.add(new_review)
-            return new_review
+        new_review = Review(**review_data)
+        self.review_repo.add(new_review)
+        return new_review
 
     def get_review(self, review_id):
         # Retrieve a review by ID
