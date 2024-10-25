@@ -50,8 +50,7 @@ class HBnBFacade:
         """
         user = self.user_repo.get(user_id)
         if user:
-            user.update_profile(**user_data)
-            return
+            return user.update_profile(**user_data)
         return None
 
     """
@@ -83,7 +82,7 @@ class HBnBFacade:
         """
         amenity = self.amenity_repo.get(amenity_id)
         if amenity:
-            return self.amenity_repo.update(amenity_id, amenity_data)
+            return amenity.update(**amenity_data)
         return None
 
     """
@@ -115,7 +114,5 @@ class HBnBFacade:
         """
         place = self.place_repo.get(place_id)
         if place:
-            for key, value in place_data.items():
-                setattr(place, key, value)
-            return self.place_repo.update(place, place_data)
+            return place.update(**place_data)
         return None

@@ -89,6 +89,33 @@ class Place(BaseModel):
                 'Owner ID must be a string or a valid user ID'
             )
 
+    def update_place(self, **kwargs):
+        """
+        Update the place.
+        """
+        if 'title' in kwargs:
+            self.title = kwargs['title']
+        if 'description' in kwargs:
+            self.description = kwargs['description']
+        if 'price' in kwargs:
+            self.price = kwargs['price']
+        if 'latitude' in kwargs:
+            self.latitude = kwargs['latitude']
+        if 'longitude' in kwargs:
+            self.longitude = kwargs['longitude']
+        if 'owner_id' in kwargs:
+            self.owner_id = kwargs['owner_id']
+
+        self.validate(
+            self.title,
+            self.description,
+            self.price,
+            self.latitude,
+            self.longitude,
+            self.owner_id
+        )
+        self.update(kwargs)
+
     def add_review(self, review):
         """Add a review to the place."""
         self.reviews.append(review)
