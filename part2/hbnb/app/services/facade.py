@@ -32,11 +32,27 @@ class HBnBFacade:
         """
         return self.user_repo.get(user_id)
 
+    def get_all_users(self):
+        """
+        Get all users.
+        """
+        return self.user_repo.get_all()
+
     def get_user_by_email(self, email):
         """
         Get a user by email.
         """
         return self.user_repo.get_by_attribute('email', email)
+
+    def update_user(self, user_id, user_data):
+        """
+        Update a user.
+        """
+        user = self.user_repo.get(user_id)
+        if user:
+            user.update_profile(**user_data)
+            return
+        return None
 
     """
     Amenity methods
