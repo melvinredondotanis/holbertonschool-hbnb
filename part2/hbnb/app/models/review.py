@@ -12,14 +12,14 @@ class Review(BaseModel):
         """
         super().__init__()
 
-        self.validate(text, rating, place, user)
+        self.validate(text, rating, place_id, user_id)
         self.text = text
         self.rating = rating
         self.place_id = place_id
         self.user_id = user_id
 
     @staticmethod
-    def validate(text, rating, place, user):
+    def validate(text, rating, place_id, user_id):
         """
         Validate review data.
         """
@@ -29,8 +29,8 @@ class Review(BaseModel):
         if rating is None or rating < 0 or rating > 5:
             raise ValueError('Rating must be between 0 and 5')
 
-        if not place:
+        if not place_id:
             raise ValueError('Place must be provided')
 
-        if not user:
+        if not user_id:
             raise ValueError('User must be provided')
