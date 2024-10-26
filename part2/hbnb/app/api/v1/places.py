@@ -128,8 +128,8 @@ class PlaceResource(Resource):
     def get(self, place_id):
         """Get place details by ID"""
         place = facade.get_place(place_id)
-        user_id = place.owner_id
         if place:
+            user_id = place.owner_id
             user = facade.get_user(user_id)
             return {
                 'id': place.id,
@@ -138,12 +138,11 @@ class PlaceResource(Resource):
                 'price': place.price,
                 'latitude': place.latitude,
                 'longitude': place.longitude,
-                'owner_id': place.owner_id,
                 'owner': {
                     'id': place.owner_id,
-                    'first_name': user.first_name if user is None else '',
-                    'last_name': user.last_name if user is None else '',
-                    'email': user.email if user is None else ''
+                    'first_name': user.first_name if user else '',
+                    'last_name': user.last_name if user else '',
+                    'email': user.email if user else ''
                     },
                 'amenities': [
                     {

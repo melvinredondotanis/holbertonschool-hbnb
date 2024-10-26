@@ -129,4 +129,4 @@ class PlaceReviewList(Resource):
                 }
                 for review in reviews
                 ], 200
-        return {'error': 'Place not found'}, 404
+        return {'error': 'Review not found'}, 404
