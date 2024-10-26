@@ -34,3 +34,24 @@ class Review(BaseModel):
 
         if not user_id:
             raise ValueError('User must be provided')
+
+    def update_review(self, **kwargs):
+        """
+        Update the review.
+        """
+        if 'text' in kwargs:
+            self.text = kwargs['text']
+        if 'rating' in kwargs:
+            self.rating = kwargs['rating']
+        if 'place' in kwargs:
+            self.place = kwargs['place']
+        if 'user' in kwargs:
+            self.user = kwargs['user']
+
+        self.validate(
+            self.text,
+            self.rating,
+            self.place,
+            self.user
+        )
+        self.update(kwargs)

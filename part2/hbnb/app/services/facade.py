@@ -33,11 +33,26 @@ class HBnBFacade:
         """
         return self.user_repo.get(user_id)
 
+    def get_all_users(self):
+        """
+        Get all users.
+        """
+        return self.user_repo.get_all()
+
     def get_user_by_email(self, email):
         """
         Get a user by email.
         """
         return self.user_repo.get_by_attribute('email', email)
+
+    def update_user(self, user_id, user_data):
+        """
+        Update a user.
+        """
+        user = self.user_repo.get(user_id)
+        if user:
+            return user.update_profile(**user_data)
+        return None
 
     """
     Amenity methods
@@ -68,7 +83,7 @@ class HBnBFacade:
         """
         amenity = self.amenity_repo.get(amenity_id)
         if amenity:
-            return self.amenity_repo.update(amenity_id, amenity_data)
+            return amenity.update(**amenity_data)
         return None
 
     """
@@ -100,9 +115,7 @@ class HBnBFacade:
         """
         place = self.place_repo.get(place_id)
         if place:
-            for key, value in place_data.items():
-                setattr(place, key, value)
-            return self.place_repo.update(place, place_data)
+            return place.update(**place_data)
         return None
 
     def create_review(self, review_data):

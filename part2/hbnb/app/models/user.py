@@ -46,10 +46,19 @@ class User(BaseModel):
         """
         Update the user's profile.
         """
-        self.update(kwargs)
+        if 'first_name' in kwargs:
+            self.first_name = kwargs['first_name']
+        if 'last_name' in kwargs:
+            self.last_name = kwargs['last_name']
+        if 'email' in kwargs:
+            self.email = kwargs['email']
+        if 'is_admin' in kwargs:
+            self.is_admin = kwargs['is_admin']
+
         self.validate(
             self.first_name,
             self.last_name,
             self.email,
             self.is_admin
             )
+        self.update(kwargs)
