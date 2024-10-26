@@ -25,13 +25,16 @@ class Amenity(BaseModel):
                 'Name must be provided and be less than 50 characters'
             )
 
-    def update(self, data):
+    def update_amenity(self, **kwargs):
         """
         Update the amenity.
         """
-        if 'name' in data:
-            self.name = data['name']
-        self.validate(self.name)
+        name = None
+        if 'name' in kwargs:
+            name = kwargs['name']
+
+        self.validate(name)
+        self.update(kwargs)
 
     def __str__(self):
         """

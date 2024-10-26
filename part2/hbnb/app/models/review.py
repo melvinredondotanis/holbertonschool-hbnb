@@ -1,4 +1,5 @@
 from app.models.base import BaseModel
+from app.services import facade
 
 
 class Review(BaseModel):
@@ -26,13 +27,13 @@ class Review(BaseModel):
         if len(text) > 1024:
             raise ValueError('Text length exceeds 1024 characters')
 
-        if rating is None or rating < 0 or rating > 5:
-            raise ValueError('Rating must be between 0 and 5')
+        if rating is None or rating < 1 or rating > 5:
+            raise ValueError('Rating must be between 1 and 5')
 
-        if not place_id:
+        if not place_id or not isinstance(place_id, str):
             raise ValueError('Place must be provided')
 
-        if not user_id:
+        if not user_id or not isinstance(user_id, str):
             raise ValueError('User must be provided')
 
     def update_review(self, **kwargs):
@@ -40,18 +41,29 @@ class Review(BaseModel):
         Update the review.
         """
         if 'text' in kwargs:
-            self.text = kwargs['text']
+            text = kwargs['text']
+        else:
+            text = self.text
+
         if 'rating' in kwargs:
-            self.rating = kwargs['rating']
+            rating = kwargs['rating']
+        else:
+            rating = self.rating
+
         if 'place' in kwargs:
-            self.place = kwargs['place']
+            place_id = kwargs['place']
+        else:
+            place_id = self.place_id
+
         if 'user' in kwargs:
-            self.user = kwargs['user']
+            user_id = kwargs['user']
+        else:
+            user_id = self.user_id
 
         self.validate(
-            self.text,
-            self.rating,
-            self.place,
-            self.user
+            text,
+            rating,
+            place_id,
+            user_id
         )
         self.update(kwargs)

@@ -93,26 +93,41 @@ class Place(BaseModel):
         """
         Update the place.
         """
+        title = None
+        description = None
+        price = None
+        latitude = None
+        longitude = None
+        owner_id = None
         if 'title' in kwargs:
-            self.title = kwargs['title']
+            title = kwargs['title']
+
+        # Else, keep the current description
+        # Note: description can be set to None
         if 'description' in kwargs:
-            self.description = kwargs['description']
+            description = kwargs['description']
+        else:
+            description = self.description
+
         if 'price' in kwargs:
-            self.price = kwargs['price']
+            price = kwargs['price']
+
         if 'latitude' in kwargs:
-            self.latitude = kwargs['latitude']
+            latitude = kwargs['latitude']
+
         if 'longitude' in kwargs:
-            self.longitude = kwargs['longitude']
+            longitude = kwargs['longitude']
+
         if 'owner_id' in kwargs:
-            self.owner_id = kwargs['owner_id']
+            owner_id = kwargs['owner_id']
 
         self.validate(
-            self.title,
-            self.description,
-            self.price,
-            self.latitude,
-            self.longitude,
-            self.owner_id
+            title,
+            description,
+            price,
+            latitude,
+            longitude,
+            owner_id
         )
         self.update(kwargs)
 
@@ -120,6 +135,14 @@ class Place(BaseModel):
         """Add a review to the place."""
         self.reviews.append(review)
 
+    def remove_review(self, review):
+        """Remove a review from the place."""
+        self.reviews.remove(review)
+
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
         self.amenities.append(amenity)
+
+    def remove_amenity(self, amenity):
+        """Remove an amenity from the place."""
+        self.amenities.remove(amenity)

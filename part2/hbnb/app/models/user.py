@@ -14,14 +14,14 @@ class User(BaseModel):
         """
         super().__init__()
 
-        self.validate(first_name, last_name, email, is_admin)
+        self.validate(first_name, last_name, email)
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.is_admin = is_admin
 
     @staticmethod
-    def validate(first_name, last_name, email, is_admin):
+    def validate(first_name, last_name, email):
         """
         Validate user data.
         """
@@ -39,26 +39,23 @@ class User(BaseModel):
         if not re.match(email_regex, email):
             raise ValueError('Invalid email format')
 
-        if not isinstance(is_admin, bool):
-            raise ValueError('is_admin must be a boolean')
-
-    def update_profile(self, **kwargs):
+    def update_user(self, **kwargs):
         """
         Update the user's profile.
         """
+        first_name = None
+        last_name = None
+        email = None
         if 'first_name' in kwargs:
-            self.first_name = kwargs['first_name']
+            first_name = kwargs['first_name']
         if 'last_name' in kwargs:
-            self.last_name = kwargs['last_name']
+            last_name = kwargs['last_name']
         if 'email' in kwargs:
-            self.email = kwargs['email']
-        if 'is_admin' in kwargs:
-            self.is_admin = kwargs['is_admin']
+            email = kwargs['email']
 
         self.validate(
-            self.first_name,
-            self.last_name,
-            self.email,
-            self.is_admin
+            first_name,
+            last_name,
+            email
             )
         self.update(kwargs)
