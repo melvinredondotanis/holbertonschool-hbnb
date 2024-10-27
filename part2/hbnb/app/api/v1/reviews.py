@@ -38,6 +38,9 @@ class ReviewList(Resource):
             place = facade.get_place(review_data['place_id'])
             if place is None:
                 return {'error': 'Invalid place_id'}, 400
+            user = facade.get_user(review_data['user_id'])
+            if user is None:
+                return {'error': 'Invalid user_id'}, 400
             place.add_review(review_data)
             review = facade.create_review(review_data)
             return {
@@ -88,10 +91,13 @@ class ReviewResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, review_id):
         """Update a review's information"""
-        if facade.get_review(review_id) is None:
+        old_review = facade.get_review(review_id)
+        if old_review is None:
             return {'error': 'Review not found'}, 404
 
         review_data = api.payload
+        if review_data['user_id'] != old_review.user_id or review_data['place_id'] != old_review.place_id:
+            return {'error': 'Invalid user_id or place_id'}, 400
         if review_data == {}:
             return {'error': 'Invalid input data'}, 400
         try:
