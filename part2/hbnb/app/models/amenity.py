@@ -12,32 +12,22 @@ class Amenity(BaseModel):
         """
         super().__init__()
 
-        self.validate(name)
         self.name = name
 
-    @staticmethod
-    def validate(name):
+    @property
+    def name(self):
         """
-        Validate amenity data.
+        Get the amenity name.
         """
-        if not name or len(name) > 50:
+        return self.__name
+
+    @name.setter
+    def name(self, value):
+        """
+        Set the amenity name.
+        """
+        if not value or len(value) > 128:
             raise ValueError(
-                'Name must be provided and be less than 50 characters'
-            )
-
-    def update_amenity(self, **kwargs):
-        """
-        Update the amenity.
-        """
-        name = None
-        if 'name' in kwargs:
-            name = kwargs['name']
-
-        self.validate(name)
-        self.update(kwargs)
-
-    def __str__(self):
-        """
-        Return a string representation of the amenity.
-        """
-        return 'Amenity(id={}, name={})'.format(self.id, self.name)
+                'Name must be provided and be less than 128 characters'
+                )
+        self.__name = value
