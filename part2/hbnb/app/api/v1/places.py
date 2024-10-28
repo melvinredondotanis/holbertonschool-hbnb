@@ -91,6 +91,13 @@ class PlaceList(Resource):
     def post(self):
         """Register a new place"""
         place_data = api.payload
+        if facade.get_user(place_data.get('owner_id')) is None:
+            return {'error': 'Invalid owner_id'}, 400
+        if place_data.get('amenities'):
+            for amenity in place_data.get('amenities'):
+                if facade.get_amenity(amenity['id']) is None:
+                    return {'error': 'Invalid amenity ID'}, 400
+
         try:
             place = facade.create_place(place_data)
             return {
@@ -100,7 +107,7 @@ class PlaceList(Resource):
                 'price': place.price,
                 'latitude': place.latitude,
                 'longitude': place.longitude,
-                'owner_id': place.owner_id,
+                'owner_id': place.owner,
                 }, 201
         except ValueError as e:
             return {'error': str(e)}, 400
@@ -129,7 +136,7 @@ class PlaceResource(Resource):
         """Get place details by ID"""
         place = facade.get_place(place_id)
         if place:
-            user_id = place.owner_id
+            user_id = place.owner
             user = facade.get_user(user_id)
             return {
                 'id': place.id,
@@ -139,15 +146,15 @@ class PlaceResource(Resource):
                 'latitude': place.latitude,
                 'longitude': place.longitude,
                 'owner': {
-                    'id': place.owner_id,
+                    'id': place.owner,
                     'first_name': user.first_name if user else '',
                     'last_name': user.last_name if user else '',
                     'email': user.email if user else ''
                     },
                 'amenities': [
                     {
-                        'id': amenity.id,
-                        'name': amenity.name
+                        'id': facade.get_place(place_id).id,
+                        'name': facade.get_amenity(amenity['id']).name
                     }
                     for amenity in place.amenities
                     ]
@@ -171,3 +178,22 @@ class PlaceResource(Resource):
         except ValueError as e:
             return {'error': str(e)}, 400
         return {'message': 'Place updated successfully'}, 200
+
+
+@api.route('/places/<place_id>/reviews')
+class PlaceReviewList(Resource):
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        """Get all reviews for a specific place"""
+        reviews = facade.get_reviews_by_place(place_id)
+        if reviews:
+            return [
+                {
+                    'id': review.id,
+                    'text': review.text,
+                    'rating': review.rating
+                }
+                for review in reviews
+                ], 200
+        return {'error': 'Review not found'}, 404

@@ -13,7 +13,8 @@ class Place(BaseModel):
             price,
             latitude,
             longitude,
-            owner_id
+            owner_id,
+            amenities
             ):
         """
         Initialize a place.
@@ -26,16 +27,17 @@ class Place(BaseModel):
             price,
             latitude,
             longitude,
-            owner_id
+            owner_id,
+            amenities
         )
         self.title = title
         self.description = description
         self.price = price
         self.latitude = latitude
         self.longitude = longitude
-        self.owner_id = owner_id
+        self.owner = owner_id
         self.reviews = []
-        self.amenities = []
+        self.amenities = amenities
 
     @staticmethod
     def validate(
@@ -44,7 +46,8 @@ class Place(BaseModel):
         price,
         latitude,
         longitude,
-        owner_id
+        owner,
+        amenities
     ):
         """
         Validate place data.
@@ -84,9 +87,14 @@ class Place(BaseModel):
                 'Longitude must be a number between -180.0 and 180.0'
             )
 
-        if not isinstance(owner_id, str):
+        if not isinstance(owner, str):
             raise ValueError(
                 'Owner ID must be a string or a valid user ID'
+                )
+
+        if not isinstance(amenities, list):
+            raise ValueError(
+                'Amenities must be a list of amenities'
             )
 
     def update_place(self, **kwargs):
@@ -98,7 +106,8 @@ class Place(BaseModel):
         price = None
         latitude = None
         longitude = None
-        owner_id = None
+        owner = None
+        amenities = None
         if 'title' in kwargs:
             title = kwargs['title']
 
@@ -118,8 +127,11 @@ class Place(BaseModel):
         if 'longitude' in kwargs:
             longitude = kwargs['longitude']
 
-        if 'owner_id' in kwargs:
-            owner_id = kwargs['owner_id']
+        if 'owner' in kwargs:
+            owner = kwargs['owner']
+
+        if 'amenities' in kwargs:
+            amenities = kwargs['amenities']
 
         self.validate(
             title,
@@ -127,7 +139,8 @@ class Place(BaseModel):
             price,
             latitude,
             longitude,
-            owner_id
+            owner,
+            amenities
         )
         self.update(kwargs)
 
@@ -142,7 +155,3 @@ class Place(BaseModel):
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
         self.amenities.append(amenity)
-
-    def remove_amenity(self, amenity):
-        """Remove an amenity from the place."""
-        self.amenities.remove(amenity)
