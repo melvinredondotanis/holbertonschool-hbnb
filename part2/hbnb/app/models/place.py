@@ -1,4 +1,5 @@
 from app.models.base import BaseModel
+from app.models.user import User
 
 
 class Place(BaseModel):
@@ -13,136 +14,144 @@ class Place(BaseModel):
             price,
             latitude,
             longitude,
-            owner_id,
-            amenities
+            owner,
+            amenities=[]
             ):
         """
         Initialize a place.
         """
         super().__init__()
 
-        self.validate(
-            title,
-            description,
-            price,
-            latitude,
-            longitude,
-            owner_id,
-            amenities
-        )
-        self.title = title
-        self.description = description
-        self.price = price
-        self.latitude = latitude
-        self.longitude = longitude
-        self.owner = owner_id
-        self.reviews = []
-        self.amenities = amenities
+        self.__title = title
+        self.__description = description
+        self.__price = price
+        self.__latitude = latitude
+        self.__longitude = longitude
+        self.__owner = owner
+        self.__reviews = []
+        self.__amenities = amenities
 
-    @staticmethod
-    def validate(
-        title,
-        description,
-        price,
-        latitude,
-        longitude,
-        owner,
-        amenities
-    ):
+    @property
+    def title(self):
         """
-        Validate place data.
+        Get the place title.
         """
-        if not isinstance(title, str) or len(title) > 100:
+        return self.__title
+
+    @title.setter
+    def title(self, value):
+        """
+        Set the place title.
+        """
+        if not isinstance(value, str) or len(value) > 100:
             raise ValueError(
                 'Title must a maximum length of 100 characters'
             )
+        self.__title = value
 
-        if description is not None and not isinstance(description, str):
+    @property
+    def description(self):
+        """
+        Get the place description.
+        """
+        return self.__description
+
+    @description.setter
+    def description(self, value):
+        """
+        Set the place description.
+        """
+        if value is not None and not isinstance(value, str) or len(value) > 2048:
             raise ValueError(
-                'Description must be a string'
+                'Description must be a string with a maximum length of 2048 characters'
             )
+        self.__description = value
 
-        if not isinstance(price, (int, float)) or price <= 0:
+    @property
+    def price(self):
+        """
+        Get the place price.
+        """
+        return self.__price
+
+    @price.setter
+    def price(self, value):
+        """
+        Set the place price.
+        """
+        if not isinstance(value, (int, float)) or value <= 0:
             raise ValueError(
                 'Price must be a positive number'
             )
+        self.__price = value
 
-        if not isinstance(
-            latitude,
-            (int, float)
-        ) or not (
-            -90.0 <= latitude <= 90.0
-        ):
+    @property
+    def latitude(self):
+        """
+        Get the place latitude.
+        """
+        return self.__latitude
+
+    @latitude.setter
+    def latitude(self, value):
+        """
+        Set the place latitude.
+        """
+        if not isinstance(value, (int, float)) or not (-90.0 <= value <= 90.0):
             raise ValueError(
                 'Latitude must be a number between -90.0 and 90.0'
             )
+        self.__latitude = value
 
-        if not isinstance(
-            longitude,
-            (int, float)
-        ) or not (
-            -180.0 <= longitude <= 180.0
-        ):
+    @property
+    def longitude(self):
+        """
+        Get the place longitude.
+        """
+        return self.__longitude
+
+    @longitude.setter
+    def longitude(self, value):
+        """
+        Set the place longitude.
+        """
+        if not isinstance(value, (int, float)) or not (-180.0 <= value <= 180.0):
             raise ValueError(
                 'Longitude must be a number between -180.0 and 180.0'
             )
+        self.__longitude = value
 
-        if not isinstance(owner, str):
+    @property
+    def owner(self):
+        """
+        Get the place owner.
+        """
+        return self.__owner
+
+    @owner.setter
+    def owner(self, value):
+        """
+        Set the place owner.
+        """
+        if not isinstance(value, User):
             raise ValueError(
-                'Owner ID must be a string or a valid user ID'
+                'Owner must be a User object'
                 )
+        self.__owner = value
 
-        if not isinstance(amenities, list):
-            raise ValueError(
-                'Amenities must be a list of amenities'
-            )
-
-    def update_place(self, **kwargs):
+    @property
+    def reviews(self):
         """
-        Update the place.
+        Get the place reviews.
         """
-        title = None
-        description = None
-        price = None
-        latitude = None
-        longitude = None
-        owner = None
-        amenities = None
-        if 'title' in kwargs:
-            title = kwargs['title']
+        return self.__reviews
 
-        # Else, keep the current description
-        # Note: description can be set to None
-        if 'description' in kwargs:
-            description = kwargs['description']
-        else:
-            description = self.description
-
-        if 'price' in kwargs:
-            price = kwargs['price']
-
-        if 'latitude' in kwargs:
-            latitude = kwargs['latitude']
-
-        if 'longitude' in kwargs:
-            longitude = kwargs['longitude']
-
-        if 'owner' in kwargs:
-            owner = kwargs['owner']
-
-        if 'amenities' in kwargs:
-            amenities = kwargs['amenities']
-
-        self.validate(
-            title,
-            description,
-            price,
-            latitude,
-            longitude,
-            owner,
-            amenities
-        )
-        self.update(kwargs)
+    @property
+    def amenities(self):
+        """
+        Get the place amenities.
+        """
+        return self.__amenities
 
     def add_review(self, review):
         """Add a review to the place."""

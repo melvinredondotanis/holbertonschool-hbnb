@@ -8,54 +8,87 @@ class User(BaseModel):
     Class representing a user of the application.
     """
 
-    def __init__(self, first_name, last_name, email, is_admin=False):
+    def __init__(
+            self,
+            first_name,
+            last_name,
+            email,
+            is_admin=False):
         """
         Initialize a user.
         """
         super().__init__()
 
-        self.validate(first_name, last_name, email)
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.is_admin = is_admin
+        self.__first_name = first_name
+        self.__last_name = last_name
+        self.__email = email
+        self.__is_admin = is_admin
 
-    @staticmethod
-    def validate(first_name, last_name, email):
+    @property
+    def first_name(self):
         """
-        Validate user data.
+        Get the user's first name.
         """
-        if not first_name or len(first_name) > 50:
+        return self.__first_name
+
+    @first_name.setter
+    def first_name(self, value):
+        """
+        Set the user's first name.
+        """
+        if not value or len(value) > 50:
             raise ValueError(
                 'First name must be provided and be less than 50 characters'
                 )
+        self.__first_name = value
 
-        if not last_name or len(last_name) > 50:
+    @property
+    def last_name(self):
+        """
+        Get the user's last name.
+        """
+        return self.__last_name
+
+    @last_name.setter
+    def last_name(self, value):
+        """
+        Set the user's last name.
+        """
+        if not value or len(value) > 50:
             raise ValueError(
                 'Last name must be provided and be less than 50 characters'
                 )
+        self.__last_name = value
 
+    @property
+    def email(self):
+        """
+        Get the user's email.
+        """
+        return self.__email
+
+    @email.setter
+    def email(self, value):
+        """
+        Set the user's email.
+        """
         email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-        if not re.match(email_regex, email):
+        if not re.match(email_regex, value):
             raise ValueError('Invalid email format')
+        self.__email = value
 
-    def update_user(self, **kwargs):
+    @property
+    def is_admin(self):
         """
-        Update the user's profile.
+        Get the user's admin status.
         """
-        first_name = None
-        last_name = None
-        email = None
-        if 'first_name' in kwargs:
-            first_name = kwargs['first_name']
-        if 'last_name' in kwargs:
-            last_name = kwargs['last_name']
-        if 'email' in kwargs:
-            email = kwargs['email']
+        return self.__is_admin
 
-        self.validate(
-            first_name,
-            last_name,
-            email
-            )
-        self.update(kwargs)
+    @is_admin.setter
+    def is_admin(self, value):
+        """
+        Set the user's admin status.
+        """
+        if not isinstance(value, bool):
+            raise ValueError('is_admin must be a boolean')
+        self.__is_admin = value

@@ -48,10 +48,7 @@ class HBnBFacade:
         """
         Update a user.
         """
-        user = self.user_repo.get(user_id)
-        if user:
-            return user.update_user(**user_data)
-        return None
+        self.user_repo.update(user_id, **user_data)
 
     """
     Amenity methods
@@ -80,10 +77,7 @@ class HBnBFacade:
         """
         Update an amenity.
         """
-        amenity = self.amenity_repo.get(amenity_id)
-        if amenity:
-            return amenity.update_amenity(**amenity_data)
-        return None
+        return self.amenity_repo.update(amenity_id, **amenity_data)
 
     """
     Place methods
@@ -112,10 +106,7 @@ class HBnBFacade:
         """
         Update a place.
         """
-        place = self.place_repo.get(place_id)
-        if place:
-            return place.update_place(**place_data)
-        return None
+        self.place_repo.update(place_id, **place_data)
 
     """
     Review methods
@@ -155,10 +146,7 @@ class HBnBFacade:
         """
         Update a review.
         """
-        review = self.review_repo.get(review_id)
-        if review:
-            return review.update_review(**review_data)
-        return None
+        return self.review_repo.update(review_id, **review_data)
 
     def delete_review(self, review_id):
         """

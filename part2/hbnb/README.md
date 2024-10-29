@@ -1,12 +1,17 @@
 # HBNB - Part 2
 
 ## Table of Contents
-- [Description](#description)
-- [Installation](#installation)
-- [Usage](#usage)
-- [File Structure](#file-structure)
-- [Explanation](#Explanation)
-- [Authors](#authors)
+- [HBNB - Part 2](#hbnb---part-2)
+  - [Table of Contents](#table-of-contents)
+  - [Description](#description)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [File Structure](#file-structure)
+  - [Explanation](#explanation)
+    - [Amenity](#amenity)
+    - [Places](#places)
+    - [Reviews](#reviews)
+  - [Authors](#authors)
 
 ## Description
 HBNB is a web application that allows users to manage and book places. This project is part of the Holberton School curriculum and focuses on implementing a full-stack web application.
@@ -55,22 +60,13 @@ part2/hbnb/
 ├── persistence
 │   ├── __init__.py
 │   └── repository.py
-├── services
+├── web_dynamic
 │   ├── __init__.py
 │   └── facade.py
 ├── config.py
 ├── requirements.txt
 └── run.py
 ```
-* The 'app/' directory contains the core application code.
-* The 'api/' directory contains the API endpoints, organized by version ('v1/').
-* The 'models/' directory contains the business logic classes.
-* The 'services/' directory is where the Facade pattern is implemented, managing the interaction between layers.
-* The 'persistence/' directory is where the in-memory repository is implemented, This will be replaced by database-backed solution using SQL alchemy.
-* 'run.py' is the entry point for flask application running.
-* 'config.py' is where the configuration for the application is stored.
-* 'requirements.txt' is where the dependencies for the application are listed.
-* 'test/' directory is where all the note about the testing result will be stored.
 
 ## Explanation
 

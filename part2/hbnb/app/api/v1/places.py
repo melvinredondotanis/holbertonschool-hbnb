@@ -85,14 +85,22 @@ place_model = api.model('Place', {
 
 @api.route('/')
 class PlaceList(Resource):
-    @api.expect(place_model)
+    @api.expect(place_model, validate=True)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new place"""
         place_data = api.payload
-        if facade.get_user(place_data.get('owner_id')) is None:
+        for key in place_data.keys():
+            if key not in place_model.keys():
+                return {'error': 'Invalid input data'}, 400
+
+        user = facade.get_user(place_data.get('owner_id'))
+        if user is None:
             return {'error': 'Invalid owner_id'}, 400
+
+        del place_data['owner_id']
+        place_data['owner'] = user
         if place_data.get('amenities'):
             for amenity in place_data.get('amenities'):
                 if facade.get_amenity(amenity['id']) is None:
@@ -107,7 +115,7 @@ class PlaceList(Resource):
                 'price': place.price,
                 'latitude': place.latitude,
                 'longitude': place.longitude,
-                'owner_id': place.owner,
+                'owner_id': place.owner.id,
                 }, 201
         except ValueError as e:
             return {'error': str(e)}, 400
@@ -136,8 +144,6 @@ class PlaceResource(Resource):
         """Get place details by ID"""
         place = facade.get_place(place_id)
         if place:
-            user_id = place.owner
-            user = facade.get_user(user_id)
             return {
                 'id': place.id,
                 'title': place.title,
@@ -146,10 +152,10 @@ class PlaceResource(Resource):
                 'latitude': place.latitude,
                 'longitude': place.longitude,
                 'owner': {
-                    'id': place.owner,
-                    'first_name': user.first_name if user else '',
-                    'last_name': user.last_name if user else '',
-                    'email': user.email if user else ''
+                    'id': place.owner.id,
+                    'first_name': place.owner.first_name,
+                    'last_name': place.owner.last_name,
+                    'email': place.owner.email
                     },
                 'amenities': [
                     {
@@ -167,12 +173,17 @@ class PlaceResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
         """Update a place's information"""
+        place_data = api.payload
+        for key in place_data.keys():
+            if key not in place_model.keys():
+                return {'error': 'Invalid input data'}, 400
+
         if facade.get_place(place_id) is None:
             return {'error': 'Place not found'}, 404
 
-        place_data = api.payload
-        if place_data == {}:
+        if place_data == facade.get_place(place_id):
             return {'error': 'Invalid input data'}, 400
+
         try:
             facade.update_place(place_id, place_data)
         except ValueError as e:
