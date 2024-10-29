@@ -182,6 +182,9 @@ class PlaceResource(Resource):
         if user is None:
             return {'error': 'Invalid owner_id'}, 400
 
+        del place_data['owner_id']
+        place_data['owner'] = user
+
         if facade.get_place(place_id) is None:
             return {'error': 'Place not found'}, 404
 
