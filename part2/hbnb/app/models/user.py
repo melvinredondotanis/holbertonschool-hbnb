@@ -19,10 +19,10 @@ class User(BaseModel):
         """
         super().__init__()
 
-        self.__first_name = first_name
-        self.__last_name = last_name
-        self.__email = email
-        self.__is_admin = is_admin
+        self.first_name = first_name
+        self.last_name = last_name
+        self.email = email
+        self.is_admin = is_admin
 
     @property
     def first_name(self):
@@ -36,7 +36,7 @@ class User(BaseModel):
         """
         Set the user's first name.
         """
-        if not value or len(value) > 50:
+        if not value or len(value) > 50 or len(value) < 1:
             raise ValueError(
                 'First name must be provided and be less than 50 characters'
                 )
@@ -54,7 +54,7 @@ class User(BaseModel):
         """
         Set the user's last name.
         """
-        if not value or len(value) > 50:
+        if not value or len(value) > 50 or len(value) < 1:
             raise ValueError(
                 'Last name must be provided and be less than 50 characters'
                 )

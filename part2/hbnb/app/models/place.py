@@ -22,14 +22,14 @@ class Place(BaseModel):
         """
         super().__init__()
 
-        self.__title = title
-        self.__description = description
-        self.__price = price
-        self.__latitude = latitude
-        self.__longitude = longitude
-        self.__owner = owner
-        self.__reviews = []
-        self.__amenities = amenities
+        self.title = title
+        self.description = description
+        self.price = price
+        self.latitude = latitude
+        self.longitude = longitude
+        self.owner = owner
+        self.reviews = []
+        self.amenities = amenities
 
     @property
     def title(self):
@@ -138,20 +138,6 @@ class Place(BaseModel):
                 'Owner must be a User object'
                 )
         self.__owner = value
-
-    @property
-    def reviews(self):
-        """
-        Get the place reviews.
-        """
-        return self.__reviews
-
-    @property
-    def amenities(self):
-        """
-        Get the place amenities.
-        """
-        return self.__amenities
 
     def add_review(self, review):
         """Add a review to the place."""

@@ -60,7 +60,7 @@ part2/hbnb/
 ├── persistence
 │   ├── __init__.py
 │   └── repository.py
-├── web_dynamic
+├── services
 │   ├── __init__.py
 │   └── facade.py
 ├── config.py

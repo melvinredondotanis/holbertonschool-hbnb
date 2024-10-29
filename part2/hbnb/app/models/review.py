@@ -1,4 +1,6 @@
 from app.models.base import BaseModel
+from app.models.place import Place
+from app.models.user import User
 
 
 class Review(BaseModel):
@@ -10,17 +12,17 @@ class Review(BaseModel):
             self,
             text,
             rating,
-            place_id,
-            user_id):
+            place,
+            user):
         """
         Initialize a review.
         """
         super().__init__()
 
-        self.__text = text
-        self.__rating = rating
-        self.__place_id = place_id
-        self.__user_id = user_id
+        self.text = text
+        self.rating = rating
+        self.place = place
+        self.user = user
 
     @property
     def text(self):
@@ -55,33 +57,33 @@ class Review(BaseModel):
         self.__rating = value
 
     @property
-    def place_id(self):
+    def place(self):
         """
-        Get the place ID.
+        Get the place.
         """
-        return self.__place_id
+        return self.__place
 
-    @place_id.setter
-    def place_id(self, value):
+    @place.setter
+    def place(self, value):
         """
-        Set the place ID.
+        Set the place.
         """
-        if not value or not isinstance(value, str):
+        if not value or not isinstance(value, Place):
             raise ValueError('Place must be provided')
-        self.__place_id = value
+        self.__place = value
 
     @property
-    def user_id(self):
+    def user(self):
         """
-        Get the user ID.
+        Get the user.
         """
-        return self.__user_id
+        return self.__user
 
-    @user_id.setter
-    def user_id(self, value):
+    @user.setter
+    def user(self, value):
         """
-        Set the user ID.
+        Set the user.
         """
-        if not value or not isinstance(value, str):
+        if not value or not isinstance(value, User):
             raise ValueError('User must be provided')
-        self.__user_id = value
+        self.__user = value

@@ -29,9 +29,6 @@ class UserList(Resource):
     def post(self):
         """Register a new user"""
         user_data = api.payload
-        for key in user_data.keys():
-            if key not in user_model.keys():
-                return {'error': 'Invalid input data'}, 400
 
         user = facade.get_user_by_email(user_data['email'])
         if user:
@@ -87,12 +84,17 @@ class UserResource(Resource):
     def put(self, user_id):
         """Update user details"""
         user_data = api.payload
-        for key in user_data.keys():
-            if key not in user_model.keys():
-                return {'error': 'Invalid input data'}, 400
+        user = facade.get_user(user_id)
+        if not user:
+            return {'error': 'User not found'}, 404
 
-        if user_data == facade.get_user(user_id):
-            return {'error': 'Invalid input data'}, 400
+        if user == facade.get_user(user_id):
+            return {'error': 'No changes detected'}, 400
+
+        if user.email != user_data['email']:
+            user = facade.get_user_by_email(user_data['email'])
+            if user:
+                return {'error': 'Email already registered'}, 400
 
         try:
             facade.update_user(user_id, user_data)

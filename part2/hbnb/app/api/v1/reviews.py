@@ -27,15 +27,12 @@ review_model = api.model('Review', {
 
 @api.route('/')
 class ReviewList(Resource):
-    @api.expect(review_model)
+    @api.expect(review_model, validate=True)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new review"""
         review_data = api.payload
-        for key in review_data.keys():
-            if key not in review_model.keys():
-                return {'error': 'Invalid input data'}, 400
 
         place = facade.get_place(review_data['place_id'])
         if place is None:
@@ -44,6 +41,10 @@ class ReviewList(Resource):
         if user is None:
             return {'error': 'Invalid user_id'}, 400
 
+        del review_data['place_id']
+        del review_data['user_id']
+        review_data['user'] = user
+        review_data['place'] = place
         try:
             review = facade.create_review(review_data)
             place.add_review(review.id)
@@ -51,8 +52,8 @@ class ReviewList(Resource):
                 "id": review.id,
                 "text": review.text,
                 "rating": review.rating,
-                "user_id": review.user_id,
-                "place_id": review.place_id
+                "user_id": review.user.id,
+                "place_id": review.place.id
                 }, 201
         except ValueError as e:
             return {'error': str(e)}, 400
@@ -84,21 +85,18 @@ class ReviewResource(Resource):
                 "id": review.id,
                 "text": review.text,
                 "rating": review.rating,
-                "user_id": review.user_id,
-                "place_id": review.place_id
+                "user_id": review.user.id,
+                "place_id": review.place.id
                 }, 200
         return {'error': 'Review not found'}, 404
 
-    @api.expect(review_model)
+    @api.expect(review_model, validate=True)
     @api.response(200, 'Review updated successfully')
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
     def put(self, review_id):
         """Update a review's information"""
         review_data = api.payload
-        for key in review_data.keys():
-            if key not in review_model.keys():
-                return {'error': 'Invalid input data'}, 400
 
         if review_data == facade.get_review(review_id):
             return {'error': 'Invalid input data'}, 400

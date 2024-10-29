@@ -15,15 +15,12 @@ amenity_model = api.model('Amenity', {
 
 @api.route('/')
 class AmenityList(Resource):
-    @api.expect(amenity_model)
+    @api.expect(amenity_model, validate=True)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new amenity"""
         amenity_data = api.payload
-        for key in amenity_data.keys():
-            if key not in amenity_model.keys():
-                return {'error': 'Invalid input data'}, 400
 
         try:
             amenity = facade.create_amenity(amenity_data)
@@ -62,16 +59,13 @@ class AmenityResource(Resource):
             'name': amenity.name
             }, 200
 
-    @api.expect(amenity_model)
+    @api.expect(amenity_model, validate=True)
     @api.response(200, 'Amenity updated successfully')
     @api.response(404, 'Amenity not found')
     @api.response(400, 'Invalid input data')
     def put(self, amenity_id):
         """Update an amenity's information"""
         amenity_data = api.payload
-        for key in amenity_data.keys():
-            if key not in amenity_model.keys():
-                return {'error': 'Invalid input data'}, 400
 
         if facade.get_amenity(amenity_id) is None:
             return {'error': 'Amenity not found'}, 404
