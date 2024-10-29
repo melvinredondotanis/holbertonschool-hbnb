@@ -127,7 +127,7 @@ class Place(BaseModel):
         Get the place owner.
         """
         return self.__owner
-    
+
     @owner.setter
     def owner(self, value):
         """

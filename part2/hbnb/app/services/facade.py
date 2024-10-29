@@ -138,7 +138,7 @@ class HBnBFacade:
         reviews = self.review_repo.get_all()
         place_reviews = []
         for review in reviews:
-            if review.place.id == place_id:
+            if review.place_id == place_id:
                 place_reviews.append(review)
         return place_reviews
 
