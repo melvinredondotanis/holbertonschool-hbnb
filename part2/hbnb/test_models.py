@@ -18,7 +18,7 @@ def test_place_creation():
     place = Place(title="Cozy Apartment", description="A nice place to stay", price=100, latitude=37.7749, longitude=-122.4194, owner=owner)
 
     # Adding a review
-    review = Review(text="Great stay!", rating=5, place=place, user=owner)
+    review = Review(text="Great stay!", rating=5, place_id=place.id, user_id=owner.id)
     place.add_review(review)
 
     assert place.title == "Cozy Apartment"
@@ -31,11 +31,11 @@ def test_place_creation():
 def test_review_creation():
     owner = User(first_name="Alice", last_name="Smith", email="alice.smith@example.com")
     place = Place(title="Cozy Apartment", description="A nice place to stay", price=100, latitude=37.7749, longitude=-122.4194, owner=owner)
-    review = Review(text="Great stay!", rating=5, place=place, user=owner)
+    review = Review(text="Great stay!", rating=5, place_id=place.id, user_id=owner.id)
     assert review.text == "Great stay!"
     assert review.rating == 5
-    assert review.place == place
-    assert review.user == owner
+    assert review.place_id == place.id
+    assert review.user_id == owner.id
     print("Review creation test passed!")
 
 
