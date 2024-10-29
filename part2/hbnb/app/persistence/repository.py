@@ -81,7 +81,7 @@ class InMemoryRepository(Repository):
         """
         return next((obj for obj in self._storage.values() if getattr(obj, attr_name) == attr_value), None)
 
-    def update(self, obj_id, data):
+    def update(self, obj_id, **data):
         """
         Update an object in the in-memory storage.
         """

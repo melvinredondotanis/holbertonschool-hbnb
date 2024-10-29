@@ -51,8 +51,8 @@ class ReviewList(Resource):
                 "id": review.id,
                 "text": review.text,
                 "rating": review.rating,
-                "user_id": review.user_id,
-                "place_id": review.place_id
+                "user_id": review.user.id,
+                "place_id": review.place.id
                 }, 201
         except ValueError as e:
             return {'error': str(e)}, 400
@@ -84,8 +84,8 @@ class ReviewResource(Resource):
                 "id": review.id,
                 "text": review.text,
                 "rating": review.rating,
-                "user_id": review.user_id,
-                "place_id": review.place_id
+                "user_id": review.user.id,
+                "place_id": review.place.id
                 }, 200
         return {'error': 'Review not found'}, 404
 
@@ -102,7 +102,7 @@ class ReviewResource(Resource):
         review_data = api.payload
         if review_data == facade.get_review(review_id):
             return {'error': 'Invalid input data'}, 400
-        if review_data['user_id'] != old_review.user_id or review_data['place_id'] != old_review.place_id:
+        if review_data['user_id'] != old_review.user.id or review_data['place_id'] != old_review.place.id:
             return {'error': 'Invalid user_id or place_id'}, 400
 
         try:

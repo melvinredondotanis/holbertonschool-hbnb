@@ -90,14 +90,11 @@ class UserResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, user_id):
         """Update user details"""
-        if facade.get_user(user_id) is None:
-            return {'error': 'User not found'}, 404
-
+        user_data = api.payload
         for key in user_data.keys():
             if key not in user_model.keys():
                 return {'error': 'Invalid input data'}, 400
 
-        user_data = api.payload
         if user_data == facade.get_user(user_id):
             return {'error': 'Invalid input data'}, 400
 

@@ -112,7 +112,7 @@ class PlaceList(Resource):
                 'price': place.price,
                 'latitude': place.latitude,
                 'longitude': place.longitude,
-                'owner_id': place.owner,
+                'owner_id': place.owner.id,
                 }, 201
         except ValueError as e:
             return {'error': str(e)}, 400
@@ -151,7 +151,7 @@ class PlaceResource(Resource):
                 'latitude': place.latitude,
                 'longitude': place.longitude,
                 'owner': {
-                    'id': place.owner,
+                    'id': place.owner.id,
                     'first_name': user.first_name if user else '',
                     'last_name': user.last_name if user else '',
                     'email': user.email if user else ''

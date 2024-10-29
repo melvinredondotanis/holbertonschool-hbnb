@@ -21,8 +21,6 @@ class AmenityList(Resource):
     def post(self):
         """Register a new amenity"""
         amenity_data = api.payload
-        if amenity_data is None:
-            return {'error': 'Invalid input data'}, 400
         for key in amenity_data.keys():
             if key not in amenity_model.keys():
                 return {'error': 'Invalid input data'}, 400
@@ -74,8 +72,6 @@ class AmenityResource(Resource):
             return {'error': 'Amenity not found'}, 404
 
         amenity_data = api.payload
-        if amenity_data == {}:
-            return {'error': 'Invalid input data'}, 400
         try:
             facade.update_amenity(amenity_id, amenity_data)
         except ValueError as e:

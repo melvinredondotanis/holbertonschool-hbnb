@@ -12,7 +12,7 @@ class Amenity(BaseModel):
         """
         super().__init__()
 
-        self.name = name
+        self.__name = name
 
     @property
     def name(self):

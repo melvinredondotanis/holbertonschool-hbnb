@@ -64,7 +64,7 @@ class Review(BaseModel):
         return self.__place
 
     @place.setter
-    def place_id(self, value):
+    def place(self, value):
         """
         Set the place ID.
         """
