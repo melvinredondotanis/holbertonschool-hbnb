@@ -178,6 +178,10 @@ class PlaceResource(Resource):
             if key not in place_model.keys():
                 return {'error': 'Invalid input data'}, 400
 
+        user = facade.get_user(place_data.get('owner_id'))
+        if user is None:
+            return {'error': 'Invalid owner_id'}, 400
+
         if facade.get_place(place_id) is None:
             return {'error': 'Place not found'}, 404
 
