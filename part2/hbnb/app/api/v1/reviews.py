@@ -33,26 +33,26 @@ class ReviewList(Resource):
     def post(self):
         """Register a new review"""
         review_data = api.payload
-
         for key in review_data.keys():
             if key not in review_model.keys():
                 return {'error': 'Invalid input data'}, 400
 
+        place = facade.get_place(review_data['place_id'])
+        if place is None:
+            return {'error': 'Invalid place_id'}, 400
+        user = facade.get_user(review_data['user_id'])
+        if user is None:
+            return {'error': 'Invalid user_id'}, 400
+
         try:
-            place = facade.get_place(review_data['place_id'])
-            if place is None:
-                return {'error': 'Invalid place_id'}, 400
-            user = facade.get_user(review_data['user_id'])
-            if user is None:
-                return {'error': 'Invalid user_id'}, 400
-            place.add_review(review_data)
             review = facade.create_review(review_data)
+            place.add_review(review.id)
             return {
                 "id": review.id,
                 "text": review.text,
                 "rating": review.rating,
-                "user_id": review.user.id,
-                "place_id": review.place.id
+                "user_id": review.user_id,
+                "place_id": review.place_id
                 }, 201
         except ValueError as e:
             return {'error': str(e)}, 400
@@ -84,8 +84,8 @@ class ReviewResource(Resource):
                 "id": review.id,
                 "text": review.text,
                 "rating": review.rating,
-                "user_id": review.user.id,
-                "place_id": review.place.id
+                "user_id": review.user_id,
+                "place_id": review.place_id
                 }, 200
         return {'error': 'Review not found'}, 404
 
@@ -95,15 +95,13 @@ class ReviewResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, review_id):
         """Update a review's information"""
-        old_review = facade.get_review(review_id)
-        if old_review is None:
-            return {'error': 'Review not found'}, 404
-
         review_data = api.payload
+        for key in review_data.keys():
+            if key not in review_model.keys():
+                return {'error': 'Invalid input data'}, 400
+
         if review_data == facade.get_review(review_id):
             return {'error': 'Invalid input data'}, 400
-        if review_data['user_id'] != old_review.user.id or review_data['place_id'] != old_review.place.id:
-            return {'error': 'Invalid user_id or place_id'}, 400
 
         try:
             facade.update_review(review_id, review_data)

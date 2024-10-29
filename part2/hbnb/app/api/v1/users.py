@@ -29,27 +29,23 @@ class UserList(Resource):
     def post(self):
         """Register a new user"""
         user_data = api.payload
-
         for key in user_data.keys():
             if key not in user_model.keys():
                 return {'error': 'Invalid input data'}, 400
 
-        existing_user = facade.get_user_by_email(user_data['email'])
-        if existing_user:
+        user = facade.get_user_by_email(user_data['email'])
+        if user:
             return {'error': 'Email already registered'}, 400
 
-        if 'is_admin' in user_data:
-            return {'error': 'Invalid input data'}, 400
-
         try:
-            new_user = facade.create_user(user_data)
+            user = facade.create_user(user_data)
         except Exception as e:
             return {'error': str(e)}, 400
         return {
-            'id': new_user.id,
-            'first_name': new_user.first_name,
-            'last_name': new_user.last_name,
-            'email': new_user.email
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email
             }, 200
 
     @api.response(200, 'List of users retrieved successfully')
@@ -96,9 +92,6 @@ class UserResource(Resource):
                 return {'error': 'Invalid input data'}, 400
 
         if user_data == facade.get_user(user_id):
-            return {'error': 'Invalid input data'}, 400
-
-        if 'is_admin' in user_data:
             return {'error': 'Invalid input data'}, 400
 
         try:

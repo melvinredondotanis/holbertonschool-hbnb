@@ -95,9 +95,12 @@ class PlaceList(Resource):
             if key not in place_model.keys():
                 return {'error': 'Invalid input data'}, 400
 
-        if facade.get_user(place_data.get('owner_id')) is None:
+        user = facade.get_user(place_data.get('owner_id'))
+        if user is None:
             return {'error': 'Invalid owner_id'}, 400
 
+        del place_data['owner_id']
+        place_data['owner'] = user
         if place_data.get('amenities'):
             for amenity in place_data.get('amenities'):
                 if facade.get_amenity(amenity['id']) is None:
@@ -141,8 +144,6 @@ class PlaceResource(Resource):
         """Get place details by ID"""
         place = facade.get_place(place_id)
         if place:
-            user_id = place.owner
-            user = facade.get_user(user_id)
             return {
                 'id': place.id,
                 'title': place.title,
@@ -152,9 +153,9 @@ class PlaceResource(Resource):
                 'longitude': place.longitude,
                 'owner': {
                     'id': place.owner.id,
-                    'first_name': user.first_name if user else '',
-                    'last_name': user.last_name if user else '',
-                    'email': user.email if user else ''
+                    'first_name': place.owner.first_name,
+                    'last_name': place.owner.last_name,
+                    'email': place.owner.email
                     },
                 'amenities': [
                     {
@@ -173,18 +174,15 @@ class PlaceResource(Resource):
     def put(self, place_id):
         """Update a place's information"""
         place_data = api.payload
-        if place_data is None:
-            return {'error': 'Invalid input data'}, 400
+        for key in place_data.keys():
+            if key not in place_model.keys():
+                return {'error': 'Invalid input data'}, 400
 
         if facade.get_place(place_id) is None:
             return {'error': 'Place not found'}, 404
 
         if place_data == facade.get_place(place_id):
             return {'error': 'Invalid input data'}, 400
-
-        for key in place_data.keys():
-            if key not in place_model.keys():
-                return {'error': 'Invalid input data'}, 400
 
         try:
             facade.update_place(place_id, place_data)

@@ -77,8 +77,8 @@ class HBnBFacade:
         """
         Update an amenity.
         """
-        return self.review_repo.update(amenity_id, **amenity_data)
-    
+        return self.amenity_repo.update(amenity_id, **amenity_data)
+
     """
     Place methods
     """
@@ -146,7 +146,7 @@ class HBnBFacade:
         """
         Update a review.
         """
-        return self.amenity_repo.update(review_id, **review_data)
+        return self.review_repo.update(review_id, **review_data)
 
     def delete_review(self, review_id):
         """
