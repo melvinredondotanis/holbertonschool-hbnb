@@ -1,0 +1,4 @@
+pycodestyle
+flask
+flask-restx
+flask-bcrypt
