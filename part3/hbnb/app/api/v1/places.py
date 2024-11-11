@@ -1,3 +1,4 @@
+from flask import request
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -227,3 +228,22 @@ class PlaceReviewList(Resource):
                 for review in reviews
                 ], 200
         return {'error': 'Review not found'}, 404
+
+
+@api.route('/places/<place_id>')
+class AdminPlaceModify(Resource):
+    @jwt_required()
+    def put(self, place_id):
+        current_user = get_jwt_identity()
+        is_admin = current_user.get('is_admin', False)
+        user_id = current_user.get('id')
+
+        place = facade.get_place(place_id)
+        if not is_admin and place.owner_id != user_id:
+            return {'error': 'Unauthorized action'}, 403
+
+        place_data = request.json
+        try:
+            facade.update_place(place_id, place_data)
+        except ValueError as e:
+            return {'error': str(e)}, 400
