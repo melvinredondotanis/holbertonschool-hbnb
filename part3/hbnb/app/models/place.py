@@ -23,7 +23,7 @@ class Place(BaseModel):
         super().__init__()
 
         self.title = title
-        self.description = description
+        self.description = description if description is not None else ''
         self.price = price
         self.latitude = latitude
         self.longitude = longitude
@@ -61,9 +61,10 @@ class Place(BaseModel):
         """
         Set the place description.
         """
-        if value is not None and not isinstance(value, str) or len(value) > 2048:
+        if value and not isinstance(value, str) or len(value) > 2048:
             raise ValueError(
-                'Description must be a string with a maximum length of 2048 characters'
+                'Description must be a string with a\
+                 maximum length of 2048 characters'
             )
         self.__description = value
 
@@ -115,7 +116,11 @@ class Place(BaseModel):
         """
         Set the place longitude.
         """
-        if not isinstance(value, (int, float)) or not (-180.0 <= value <= 180.0):
+        if not isinstance(value, (int, float)):
+            raise ValueError(
+                'Longitude must be a number between -180.0 and 180.0'
+            )
+        elif not (-180.0 <= value <= 180.0):
             raise ValueError(
                 'Longitude must be a number between -180.0 and 180.0'
             )
