@@ -122,13 +122,13 @@ class UserRepository(SQLAlchemyRepository):
         """
         Get a user by ID.
         """
-        return self.get(user_id)
+        return super().get(user_id)
 
     def get_all(self):
         """
         Get all users.
         """
-        return self.get_all()
+        return super().get_all()
 
     def get_by_email(self, email):
         """
