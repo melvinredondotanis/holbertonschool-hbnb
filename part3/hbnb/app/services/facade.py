@@ -32,13 +32,13 @@ class HBnBFacade:
         """
         Get a user by ID.
         """
-        return self.user_repo.get_user(user_id)
+        return self.user_repo.get(user_id)
 
     def get_all_users(self):
         """
         Get all users.
         """
-        return self.user_repo.get_all_users()
+        return self.user_repo.get_all()
 
     def get_user_by_email(self, email):
         """
@@ -50,7 +50,7 @@ class HBnBFacade:
         """
         Update a user.
         """
-        self.user_repo.update_user(user_id, **user_data)
+        self.user_repo.update(user_id, **user_data)
 
     """
     Amenity methods

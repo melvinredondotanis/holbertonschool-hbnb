@@ -118,13 +118,13 @@ class UserRepository(SQLAlchemyRepository):
         """
         super().__init__(User)
 
-    def get_user(self, user_id):
+    def get(self, user_id):
         """
         Get a user by ID.
         """
         return self.get(user_id)
 
-    def get_all_users(self):
+    def get_all(self):
         """
         Get all users.
         """
@@ -136,7 +136,7 @@ class UserRepository(SQLAlchemyRepository):
         """
         return self.model.query.filter_by(email=email).first()
 
-    def update_user(self, obj_id, data):
+    def update(self, obj_id, data):
         """
         Update a user.
         """
