@@ -29,7 +29,7 @@ class Review(BaseModel):
         Set the review text.
         """
         if len(value) > 2048:
-            raise ValueError('Text length exceeds 2048 characters')
+            raise ValueError('Text length exceeds 2048 characters.')
         self._text = value
 
     @hybrid_property
@@ -37,7 +37,7 @@ class Review(BaseModel):
         """
         Get the review rating.
         """
-        return self.__rating
+        return self._rating
 
     @rating.setter
     def rating(self, value):
@@ -45,7 +45,7 @@ class Review(BaseModel):
         Set the review rating.
         """
         if value < 1 or value > 5:
-            raise ValueError('Rating must be between 1 and 5')
+            raise ValueError('Rating must be between 1 and 5.')
         self._rating = value
 
     @hybrid_property
@@ -62,7 +62,7 @@ class Review(BaseModel):
         """
         if not isinstance(value, str) or len(value) != 36:
             raise ValueError(
-                'Place ID must be a string of 36 characters'
+                'Place ID must be a string of 36 characters.'
             )
         self._place = value
 
@@ -80,6 +80,6 @@ class Review(BaseModel):
         """
         if not isinstance(value, str) or len(value) != 36:
             raise ValueError(
-                'User ID must be a string of 36 characters'
+                'User ID must be a string of 36 characters.'
                 )
         self._user_id = value

@@ -32,7 +32,7 @@ class Place(BaseModel):
         """
         if not isinstance(value, str) or len(value) > 255:
             raise ValueError(
-                'Title must a maximum length of 255 characters'
+                'Title must a maximum length of 255 characters.'
             )
         self._title = value
 
@@ -51,7 +51,7 @@ class Place(BaseModel):
         if value and not isinstance(value, str) or len(value) > 2048:
             raise ValueError(
                 'Description must be a string with a\
-                 maximum length of 2048 characters'
+                 maximum length of 2048 characters.'
             )
         self._description = value
 
@@ -69,7 +69,7 @@ class Place(BaseModel):
         """
         if not isinstance(value, (int, float)) or value <= 0:
             raise ValueError(
-                'Price must be a positive number'
+                'Price must be a positive number.'
             )
         self._price = value
 
@@ -87,7 +87,7 @@ class Place(BaseModel):
         """
         if not isinstance(value, (int, float)) or not (-90.0 <= value <= 90.0):
             raise ValueError(
-                'Latitude must be a number between -90.0 and 90.0'
+                'Latitude must be a number between -90.0 and 90.0.'
             )
         self._latitude = value
 
@@ -105,11 +105,11 @@ class Place(BaseModel):
         """
         if not isinstance(value, (int, float)):
             raise ValueError(
-                'Longitude must be a number between -180.0 and 180.0'
+                'Longitude must be a number between -180.0 and 180.0.'
             )
         elif not (-180.0 <= value <= 180.0):
             raise ValueError(
-                'Longitude must be a number between -180.0 and 180.0'
+                'Longitude must be a number between -180.0 and 180.0.'
             )
         self._longitude = value
 
@@ -127,7 +127,7 @@ class Place(BaseModel):
         """
         if not isinstance(value, str) or len(value) != 36:
             raise ValueError(
-                'Owner ID must be a string of 36 characters'
+                'Owner ID must be a string of 36 characters.'
             )
         self._owner_id = value
 

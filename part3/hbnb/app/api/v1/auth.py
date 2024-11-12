@@ -27,7 +27,7 @@ class Login(Resource):
         credentials = api.payload
         user = facade.get_user_by_email(credentials['email'])
         if user is None or not user.verify_password(credentials['password']):
-            return {'error': 'Invalid credentials'}, 401
+            return {'error': 'Invalid credentials.'}, 401
 
         access_token = create_access_token(identity={
                                                     'id': str(user.id),

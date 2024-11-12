@@ -33,7 +33,7 @@ class User(BaseModel):
         """
         if not value or len(value) > 50 or len(value) < 1:
             raise ValueError(
-                'First name must be provided and be less than 50 characters'
+                'First name must be provided and be less than 50 characters.'
                 )
         self._first_name = value
 
@@ -51,7 +51,7 @@ class User(BaseModel):
         """
         if not value or len(value) > 50 or len(value) < 1:
             raise ValueError(
-                'Last name must be provided and be less than 50 characters'
+                'Last name must be provided and be less than 50 characters.'
                 )
         self._last_name = value
 
@@ -69,9 +69,9 @@ class User(BaseModel):
         """
         email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
         if not value or len(value) > 120:
-            raise ValueError('Email must be provided and be less than 120 characters')
+            raise ValueError('Email must be provided and be less than 120 characters.')
         if not re.match(email_regex, value):
-            raise ValueError('Invalid email format')
+            raise ValueError('Invalid email format.')
         self._email = value
 
     @hybrid_property
@@ -87,7 +87,7 @@ class User(BaseModel):
         Set the user's admin status.
         """
         if not isinstance(value, bool):
-            raise ValueError('is_admin must be a boolean')
+            raise ValueError('is_admin must be a boolean.')
         self._is_admin = value
 
     def hash_password(self, password):
@@ -100,16 +100,22 @@ class User(BaseModel):
 
     @hybrid_property
     def password(self):
+        """
+        Get the user's password.
+        """
         return self._password
 
     @password.setter
     def password(self, value):
+        """
+        Set the user's password.
+        """
         if not value or len(value) < 8:
-            raise ValueError('Password must be at least 8 characters')
+            raise ValueError('Password must be at least 8 characters.')
         if len(value) > 128:
-            raise ValueError('Password must be less than 128 characters')
+            raise ValueError('Password must be less than 128 characters.')
         if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$', value):
             raise ValueError(
-                'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+                'Password must contain at least one uppercase letter, one lowercase letter, and one number.'
                 )
         self.hash_password(value)

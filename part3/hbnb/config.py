@@ -1,9 +1,11 @@
 import os
+from datetime import timedelta
 
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'xXx_im_the_best_developer_xXx')
     DEBUG = False
+    JWT_SECRET_KEY = timedelta(days=7)
 
 
 class DevelopmentConfig(Config):

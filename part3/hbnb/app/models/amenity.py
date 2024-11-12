@@ -27,6 +27,6 @@ class Amenity(BaseModel):
         """
         if not value or len(value) > 128:
             raise ValueError(
-                'Name must be provided and be less than 128 characters'
+                'Name must be provided and be less than 128 characters.'
                 )
         self._name = value
