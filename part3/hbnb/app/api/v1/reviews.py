@@ -51,13 +51,9 @@ class ReviewList(Resource):
         if facade.get_reviews_by_place(user.id, place.id):
             return {'error': 'You have already reviewed this place.'}, 400
 
-        if current_user['id'] != place.owner.id:
+        if current_user['id'] != place.owner_id:
             return {'error': 'Unauthorized action'}, 403
 
-        del review_data['place_id']
-        del review_data['user_id']
-        review_data['user'] = user
-        review_data['place'] = place
         try:
             review = facade.create_review(review_data)
             place.add_review(review.id)
@@ -65,8 +61,8 @@ class ReviewList(Resource):
                 "id": review.id,
                 "text": review.text,
                 "rating": review.rating,
-                "user_id": review.user.id,
-                "place_id": review.place.id
+                "user_id": review.user_id,
+                "place_id": review.place_id
                 }, 201
         except ValueError as e:
             return {'error': str(e)}, 400
@@ -98,8 +94,8 @@ class ReviewResource(Resource):
                 "id": review.id,
                 "text": review.text,
                 "rating": review.rating,
-                "user_id": review.user.id,
-                "place_id": review.place.id
+                "user_id": review.user_id,
+                "place_id": review.place_id
                 }, 200
         return {'error': 'Review not found'}, 404
 
@@ -117,7 +113,7 @@ class ReviewResource(Resource):
             return {'error': 'Invalid input data'}, 400
 
         review = facade.get_reviews_by_place(review_data['place_id'])
-        if review.owner.id != current_user['id']:
+        if review.owner_id != current_user['id']:
             return {'error': 'Unauthorized action'}, 403
 
         if review_data == facade.get_review(review_id):

@@ -70,10 +70,6 @@ place_model = api.model('Place', {
         required=True,
         description='ID of the owner'
         ),
-    'owner': fields.Nested(
-        user_model,
-        description='Owner of the place'
-        ),
     'amenities': fields.List(
         fields.Nested(amenity_model),
         description='List of amenities'

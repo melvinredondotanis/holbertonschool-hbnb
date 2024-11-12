@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 
+from app import db
+from app.models.user import User
+
 
 class Repository(ABC):
     """
@@ -48,50 +51,93 @@ class Repository(ABC):
         """
         pass
 
-
-class InMemoryRepository(Repository):
+class SQLAlchemyRepository(Repository):
     """
-    In-memory implementation of the Repository.
+    SQLAlchemy implementation of the Repository.
     """
 
-    def __init__(self):
-        self._storage = {}
+    def __init__(self, model):
+        """
+        Initialize the repository with the model to use.
+        """
+        self.model = model
 
     def add(self, obj):
         """
-        Add an object to the in-memory storage.
+        Add an object to the database.
         """
-        self._storage[obj.id] = obj
+        db.session.add(obj)
+        db.session.commit()
 
     def get(self, obj_id):
         """
-        Get an object from the in-memory storage by its ID.
+        Get an object from the database by its ID.
         """
-        return self._storage.get(obj_id)
+        return self.model.query.get(obj_id)
 
     def get_all(self):
         """
-        Get all objects from the in-memory storage.
+        Get all objects from the database.
         """
-        return list(self._storage.values())
+        return self.model.query.all()
 
-    def get_by_attribute(self, attr_name, attr_value):
+    def update(self, obj_id, data):
         """
-        Get an object from the in-memory storage by a specific attribute.
-        """
-        return next((obj for obj in self._storage.values() if getattr(obj, attr_name) == attr_value), None)
-
-    def update(self, obj_id, **data):
-        """
-        Update an object in the in-memory storage.
+        Update an object in the database.
         """
         obj = self.get(obj_id)
         if obj:
-            obj.update(data)
+            for key, value in data.items():
+                setattr(obj, key, value)
+            db.session.commit()
 
     def delete(self, obj_id):
         """
-        Delete an object from the in-memory storage by its ID.
+        Delete an object from the database by its ID.
         """
-        if obj_id in self._storage:
-            del self._storage[obj_id]
+        obj = self.get(obj_id)
+        if obj:
+            db.session.delete(obj)
+            db.session.commit()
+
+    def get_by_attribute(self, attr_name, attr_value):
+        """
+        Get an object from the database by a specific attribute.
+        """
+        return self.model.query.filter_by(**{attr_name: attr_value}).first()
+
+
+class UserRepository(SQLAlchemyRepository):
+    """
+    Repository for User objects.
+    """
+
+    def __init__(self):
+        """
+        Initialize the repository with the User model.
+        """
+        super().__init__(User)
+
+    def get_user(self, user_id):
+        """
+        Get a user by ID.
+        """
+        return self.get(user_id)
+
+    def get_all_users(self):
+        """
+        Get all users.
+        """
+        return self.get_all()
+
+    def get_by_email(self, email):
+        """
+        Get a user by email.
+        """
+        return self.model.query.filter_by(email=email).first()
+
+    def update_user(self, obj_id, data):
+        """
+        Update a user.
+        """
+        return super().update(obj_id, data)

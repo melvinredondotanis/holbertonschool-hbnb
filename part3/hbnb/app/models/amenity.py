@@ -1,3 +1,6 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
+from app import db
 from app.models.base import BaseModel
 
 
@@ -6,20 +9,16 @@ class Amenity(BaseModel):
     Class representing an amenity.
     """
 
-    def __init__(self, name):
-        """
-        Initialize an amenity.
-        """
-        super().__init__()
+    __tablename__ = 'amenities'
 
-        self.name = name
+    _name = db.Column(db.String(128), nullable=False)
 
-    @property
+    @hybrid_property
     def name(self):
         """
         Get the amenity name.
         """
-        return self.__name
+        return self._name
 
     @name.setter
     def name(self, value):
@@ -30,4 +29,4 @@ class Amenity(BaseModel):
             raise ValueError(
                 'Name must be provided and be less than 128 characters'
                 )
-        self.__name = value
+        self._name = value

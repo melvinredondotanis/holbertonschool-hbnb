@@ -1,5 +1,7 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
+from app import db
 from app.models.base import BaseModel
-from app.models.user import User
 
 
 class Place(BaseModel):
@@ -7,54 +9,39 @@ class Place(BaseModel):
     Class representing a place.
     """
 
-    def __init__(
-            self,
-            title,
-            description,
-            price,
-            latitude,
-            longitude,
-            owner,
-            amenities=[]
-            ):
-        """
-        Initialize a place.
-        """
-        super().__init__()
+    __tablename__ = 'places'
 
-        self.title = title
-        self.description = description if description is not None else ''
-        self.price = price
-        self.latitude = latitude
-        self.longitude = longitude
-        self.owner = owner
-        self.reviews = []
-        self.amenities = amenities
+    _title = db.Column(db.String(255), nullable=False)
+    _description = db.Column(db.Text, nullable=True)
+    _price = db.Column(db.Numeric(10, 2), nullable=False)
+    _latitude = db.Column(db.Float, nullable=False)
+    _longitude = db.Column(db.Float, nullable=False)
+    _owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
 
-    @property
+    @hybrid_property
     def title(self):
         """
         Get the place title.
         """
-        return self.__title
+        return self._title
 
     @title.setter
     def title(self, value):
         """
         Set the place title.
         """
-        if not isinstance(value, str) or len(value) > 100:
+        if not isinstance(value, str) or len(value) > 255:
             raise ValueError(
-                'Title must a maximum length of 100 characters'
+                'Title must a maximum length of 255 characters'
             )
-        self.__title = value
+        self._title = value
 
-    @property
+    @hybrid_property
     def description(self):
         """
         Get the place description.
         """
-        return self.__description
+        return self._description
 
     @description.setter
     def description(self, value):
@@ -66,14 +53,14 @@ class Place(BaseModel):
                 'Description must be a string with a\
                  maximum length of 2048 characters'
             )
-        self.__description = value
+        self._description = value
 
-    @property
+    @hybrid_property
     def price(self):
         """
         Get the place price.
         """
-        return self.__price
+        return self._price
 
     @price.setter
     def price(self, value):
@@ -84,14 +71,14 @@ class Place(BaseModel):
             raise ValueError(
                 'Price must be a positive number'
             )
-        self.__price = value
+        self._price = value
 
-    @property
+    @hybrid_property
     def latitude(self):
         """
         Get the place latitude.
         """
-        return self.__latitude
+        return self._latitude
 
     @latitude.setter
     def latitude(self, value):
@@ -102,14 +89,14 @@ class Place(BaseModel):
             raise ValueError(
                 'Latitude must be a number between -90.0 and 90.0'
             )
-        self.__latitude = value
+        self._latitude = value
 
-    @property
+    @hybrid_property
     def longitude(self):
         """
         Get the place longitude.
         """
-        return self.__longitude
+        return self._longitude
 
     @longitude.setter
     def longitude(self, value):
@@ -124,25 +111,25 @@ class Place(BaseModel):
             raise ValueError(
                 'Longitude must be a number between -180.0 and 180.0'
             )
-        self.__longitude = value
+        self._longitude = value
 
-    @property
-    def owner(self):
+    @hybrid_property
+    def owner_id(self):
         """
-        Get the place owner.
+        Get the place owner's ID.
         """
-        return self.__owner
+        return self._owner_id
 
-    @owner.setter
-    def owner(self, value):
+    @owner_id.setter
+    def owner_id(self, value):
         """
-        Set the place owner.
+        Set the place owner's ID.
         """
-        if not isinstance(value, User):
+        if not isinstance(value, str) or len(value) != 36:
             raise ValueError(
-                'Owner must be a User object'
-                )
-        self.__owner = value
+                'Owner ID must be a string of 36 characters'
+            )
+        self._owner_id = value
 
     def add_review(self, review):
         """Add a review to the place."""

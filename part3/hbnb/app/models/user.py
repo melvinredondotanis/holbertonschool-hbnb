@@ -1,6 +1,8 @@
 import re
 
-from app import bcrypt
+from sqlalchemy.ext.hybrid import hybrid_property
+
+from app import bcrypt, db
 from app.models.base import BaseModel
 
 
@@ -9,30 +11,20 @@ class User(BaseModel):
     Class representing a user of the application.
     """
 
-    def __init__(
-            self,
-            first_name,
-            last_name,
-            email,
-            password,
-            is_admin=False):
-        """
-        Initialize a user.
-        """
-        super().__init__()
+    __tablename__ = 'users'
 
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.password = password
-        self.is_admin = is_admin
+    _first_name = db.Column(db.String(50), nullable=False)
+    _last_name = db.Column(db.String(50), nullable=False)
+    _email = db.Column(db.String(120), nullable=False, unique=True)
+    _password = db.Column(db.String(128), nullable=False)
+    _is_admin = db.Column(db.Boolean, default=False)
 
-    @property
+    @hybrid_property
     def first_name(self):
         """
         Get the user's first name.
         """
-        return self.__first_name
+        return self._first_name
 
     @first_name.setter
     def first_name(self, value):
@@ -43,14 +35,14 @@ class User(BaseModel):
             raise ValueError(
                 'First name must be provided and be less than 50 characters'
                 )
-        self.__first_name = value
+        self._first_name = value
 
-    @property
+    @hybrid_property
     def last_name(self):
         """
         Get the user's last name.
         """
-        return self.__last_name
+        return self._last_name
 
     @last_name.setter
     def last_name(self, value):
@@ -61,14 +53,14 @@ class User(BaseModel):
             raise ValueError(
                 'Last name must be provided and be less than 50 characters'
                 )
-        self.__last_name = value
+        self._last_name = value
 
-    @property
+    @hybrid_property
     def email(self):
         """
         Get the user's email.
         """
-        return self.__email
+        return self._email
 
     @email.setter
     def email(self, value):
@@ -76,16 +68,18 @@ class User(BaseModel):
         Set the user's email.
         """
         email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        if not value or len(value) > 120:
+            raise ValueError('Email must be provided and be less than 120 characters')
         if not re.match(email_regex, value):
             raise ValueError('Invalid email format')
-        self.__email = value
+        self._email = value
 
-    @property
+    @hybrid_property
     def is_admin(self):
         """
         Get the user's admin status.
         """
-        return self.__is_admin
+        return self._is_admin
 
     @is_admin.setter
     def is_admin(self, value):
@@ -94,26 +88,26 @@ class User(BaseModel):
         """
         if not isinstance(value, bool):
             raise ValueError('is_admin must be a boolean')
-        self.__is_admin = value
+        self._is_admin = value
 
     def hash_password(self, password):
         """Hashes the password before storing it."""
-        self.__password = bcrypt.generate_password_hash(password).decode('utf-8')
+        self._password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
         return bcrypt.check_password_hash(self.password, password)
 
-    @property
+    @hybrid_property
     def password(self):
-        return self.__password
+        return self._password
 
     @password.setter
     def password(self, value):
         if not value or len(value) < 8:
             raise ValueError('Password must be at least 8 characters')
-        if len(value) > 65:
-            raise ValueError('Password must be less than 65 characters')
+        if len(value) > 128:
+            raise ValueError('Password must be less than 128 characters')
         if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$', value):
             raise ValueError(
                 'Password must contain at least one uppercase letter, one lowercase letter, and one number'

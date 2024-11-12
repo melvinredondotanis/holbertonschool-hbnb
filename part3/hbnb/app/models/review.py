@@ -1,6 +1,7 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
+from app import db
 from app.models.base import BaseModel
-from app.models.place import Place
-from app.models.user import User
 
 
 class Review(BaseModel):
@@ -8,28 +9,19 @@ class Review(BaseModel):
     Class representing a review of a place.
     """
 
-    def __init__(
-            self,
-            text,
-            rating,
-            place,
-            user):
-        """
-        Initialize a review.
-        """
-        super().__init__()
+    __tablename__ = 'reviews'
 
-        self.text = text
-        self.rating = rating
-        self.place = place
-        self.user = user
+    _text = db.Column(db.Text, nullable=False)
+    _rating = db.Column(db.Integer, nullable=False)
+    _place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=False)
+    _user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
 
-    @property
+    @hybrid_property
     def text(self):
         """
         Get the review text.
         """
-        return self.__text
+        return self._text
 
     @text.setter
     def text(self, value):
@@ -38,9 +30,9 @@ class Review(BaseModel):
         """
         if len(value) > 2048:
             raise ValueError('Text length exceeds 2048 characters')
-        self.__text = value
+        self._text = value
 
-    @property
+    @hybrid_property
     def rating(self):
         """
         Get the review rating.
@@ -54,36 +46,40 @@ class Review(BaseModel):
         """
         if value < 1 or value > 5:
             raise ValueError('Rating must be between 1 and 5')
-        self.__rating = value
+        self._rating = value
 
-    @property
-    def place(self):
+    @hybrid_property
+    def place_id(self):
         """
         Get the place.
         """
-        return self.__place
+        return self._place
 
-    @place.setter
-    def place(self, value):
+    @place_id.setter
+    def place_id(self, value):
         """
         Set the place.
         """
-        if not value or not isinstance(value, Place):
-            raise ValueError('Place must be provided')
-        self.__place = value
+        if not isinstance(value, str) or len(value) != 36:
+            raise ValueError(
+                'Place ID must be a string of 36 characters'
+            )
+        self._place = value
 
-    @property
-    def user(self):
+    @hybrid_property
+    def user_id(self):
         """
         Get the user.
         """
-        return self.__user
-
-    @user.setter
-    def user(self, value):
+        return self._user_id
+    
+    @user_id.setter
+    def user_id(self, value):
         """
         Set the user.
         """
-        if not value or not isinstance(value, User):
-            raise ValueError('User must be provided')
-        self.__user = value
+        if not isinstance(value, str) or len(value) != 36:
+            raise ValueError(
+                'User ID must be a string of 36 characters'
+                )
+        self._user_id = value
