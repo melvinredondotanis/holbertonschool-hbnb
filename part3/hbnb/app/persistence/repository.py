@@ -51,6 +51,7 @@ class Repository(ABC):
         """
         pass
 
+
 class SQLAlchemyRepository(Repository):
     """
     SQLAlchemy implementation of the Repository.
@@ -81,7 +82,7 @@ class SQLAlchemyRepository(Repository):
         """
         return self.model.query.all()
 
-    def update(self, obj_id, data):
+    def update(self, obj_id, **data):
         """
         Update an object in the database.
         """
@@ -118,26 +119,8 @@ class UserRepository(SQLAlchemyRepository):
         """
         super().__init__(User)
 
-    def get(self, user_id):
-        """
-        Get a user by ID.
-        """
-        return super().get(user_id)
-
-    def get_all(self):
-        """
-        Get all users.
-        """
-        return super().get_all()
-
     def get_by_email(self, email):
         """
         Get a user by email.
         """
         return self.model.query.filter_by(email=email).first()
-
-    def update(self, obj_id, data):
-        """
-        Update a user.
-        """
-        return super().update(obj_id, data)

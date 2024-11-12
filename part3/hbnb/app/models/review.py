@@ -72,7 +72,7 @@ class Review(BaseModel):
         Get the user.
         """
         return self._user_id
-    
+
     @user_id.setter
     def user_id(self, value):
         """

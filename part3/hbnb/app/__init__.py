@@ -28,7 +28,16 @@ def create_app(config_class=config.DevelopmentConfig):
         version='1.0',
         title='HBnB API',
         description='HBnB Application API',
-        contact_email='melvin.redondotanis@holbertonstudents.com'
+        contact_email='melvin.redondotanis@holbertonstudents.com',
+        authorizations={
+            'BearerAuth': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'Authorization',
+                'description': 'Bearer authentication token'
+                }
+            },
+        security='BearerAuth'
     )
 
     api.add_namespace(auth_ns, path='/api/v1/auth')

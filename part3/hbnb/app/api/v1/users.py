@@ -1,4 +1,3 @@
-from flask import request
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -35,10 +34,8 @@ class UserList(Resource):
     def post(self):
         """Register a new user"""
         user_data = api.payload
-
-        user = facade.get_user_by_email(user_data['email'])
-        if user:
-            return {'error': 'Email already registered'}, 400
+        if facade.get_user_by_email(user_data['email']):
+            return {'error': 'Email already registered.'}, 400
 
         try:
             user = facade.create_user(user_data)
@@ -80,9 +77,9 @@ class UserResource(Resource):
                 'last_name': user.last_name,
                 'email': user.email
                 }, 200
-        return {'error': 'User not found'}, 404
+        return {'error': 'User not found.'}, 404
 
-    @api.expect(user_model, validate=True)
+    @api.expect(user_model)
     @api.response(200, 'User successfully updated')
     @api.response(404, 'User not found')
     @api.response(400, 'Invalid input data')
@@ -92,35 +89,22 @@ class UserResource(Resource):
         """Update user details"""
         current_user = get_jwt_identity()
         user_data = api.payload
+        if user_data.get('email') or user_data.get('password'):
+            return {'error': 'You cannot modify email or password.'}, 403
+
+        for key in user_data:
+            if key not in ['first_name', 'last_name']:
+                return {'error': 'Invalid input data.'}, 400
 
         if current_user['id'] != user_id:
             return {'error': 'Unauthorized action.'}, 403
 
-        if current_user['is_admin'] is False:
-            if user_data['password'] or user_data['email']:
-                return {'error': 'You cannot modify email or password.'}, 403
-
-        user = facade.get_user(user_id)
-        if not user:
-            return {'error': 'User not found'}, 404
-
-        if user == facade.get_user(user_id) and not user_data['password']:
-            return {'error': 'No changes detected'}, 400
-
-        if user.email != user_data['email']:
-            user = facade.get_user_by_email(user_data['email'])
-            if user:
-                return {'error': 'Email already registered'}, 400
+        if not facade.get_user(user_id):
+            return {'error': 'User not found.'}, 404
 
         try:
             facade.update_user(user_id, user_data)
         except Exception as e:
             return {'error': str(e)}, 400
 
-        user = facade.get_user(user_id)
-        return {
-            'id': user.id,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email
-            }, 200
+        return self.get(user_id)
