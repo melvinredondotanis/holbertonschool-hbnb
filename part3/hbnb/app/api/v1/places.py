@@ -170,24 +170,30 @@ class PlaceResource(Resource):
             if key not in ['title', 'price', 'description', 'latitude', 'longitude', 'owner_id']:
                 return {'error': 'Invalid input data.'}, 400
 
-        user = facade.get_user(place_data.get('owner_id'))
-        if user is None:
-            return {'error': 'Invalid owner_id.'}, 400
+        # Trust no one
+        if current_user.get('is_admin', True):
+            is_admin = facade.get_user(current_user['id']).is_admin
+            if not is_admin:
+                return {'error': 'Admin privileges required.'}, 403
+        else:
+            user = facade.get_user(place_data.get('owner_id'))
+            if user is None:
+                return {'error': 'Invalid owner_id.'}, 400
 
-        is_admin = facade.get_user(current_user['id']).is_admin
-        if not is_admin and current_user['id'] != user.id:
-            return {'error': 'Unauthorized action.'}, 403
+            is_admin = facade.get_user(current_user['id']).is_admin
+            if not is_admin and current_user['id'] != user.id:
+                return {'error': 'Unauthorized action.'}, 403
 
-        if facade.get_place(place_id) is None:
-            return {'error': 'Place not found.'}, 404
+            if facade.get_place(place_id) is None:
+                return {'error': 'Place not found.'}, 404
 
-        if place_data == facade.get_place(place_id):
-            return {'error': 'Invalid input data.'}, 400
+            if place_data == facade.get_place(place_id):
+                return {'error': 'Invalid input data.'}, 400
 
-        if place_data.get('amenities'):
-            for amenity in place_data.get('amenities'):
-                if facade.get_amenity(amenity['id']) is None:
-                    return {'error': 'Invalid amenity ID.'}, 400
+            if place_data.get('amenities'):
+                for amenity in place_data.get('amenities'):
+                    if facade.get_amenity(amenity['id']) is None:
+                        return {'error': 'Invalid amenity ID.'}, 400
 
         try:
             facade.update_place(place_id, place_data)

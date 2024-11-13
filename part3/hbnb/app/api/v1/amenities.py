@@ -22,11 +22,16 @@ class AmenityList(Resource):
     @jwt_required()
     def post(self):
         """Register a new amenity"""
+        # Trust no one
         current_user = get_jwt_identity()
-        amenity_data = api.payload
-        if not current_user.get('is_admin', True):
+        if current_user.get('is_admin', True):
+            is_admin = facade.get_user(current_user['id']).is_admin
+            if not is_admin:
+                return {'error': 'Admin privileges required.'}, 403
+        else:
             return {'error': 'Admin privileges required.'}, 403
 
+        amenity_data = api.payload
         try:
             amenity = facade.create_amenity(amenity_data)
         except ValueError as e:
@@ -71,11 +76,15 @@ class AmenityResource(Resource):
     @jwt_required()
     def put(self, amenity_id):
         """Update an amenity's information"""
-        amenity_data = api.payload
         current_user = get_jwt_identity()
-        if not current_user.get('is_admin', True):
+        if current_user.get('is_admin', True):
+            is_admin = facade.get_user(current_user['id']).is_admin
+            if not is_admin:
+                return {'error': 'Admin privileges required.'}, 403
+        else:
             return {'error': 'Admin privileges required.'}, 403
 
+        amenity_data = api.payload
         if facade.get_amenity(amenity_id) is None:
             return {'error': 'Amenity not found.'}, 404
 

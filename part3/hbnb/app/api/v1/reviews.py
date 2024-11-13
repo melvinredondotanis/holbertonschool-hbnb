@@ -36,7 +36,6 @@ class ReviewList(Resource):
         """Register a new review"""
         current_user = get_jwt_identity()
         review_data = api.payload
-
         if current_user['id'] != review_data['user_id']:
             return {'error': 'You cannot review your own place.'}, 400
 
