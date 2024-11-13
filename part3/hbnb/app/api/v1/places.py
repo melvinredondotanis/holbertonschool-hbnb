@@ -93,15 +93,15 @@ class PlaceList(Resource):
         place_data = api.payload
         user = facade.get_user(place_data.get('owner_id'))
         if user is None:
-            return {'error': 'Invalid owner_id'}, 400
+            return {'error': 'Invalid owner_id.'}, 400
 
         if current_user['id'] != user.id:
-            return {'error': 'Unauthorized action'}, 403
+            return {'error': 'Unauthorized action.'}, 403
 
         if place_data.get('amenities'):
             for amenity in place_data.get('amenities'):
                 if facade.get_amenity(amenity['id']) is None:
-                    return {'error': 'Invalid amenity ID'}, 400
+                    return {'error': 'Invalid amenity ID.'}, 400
 
         try:
             place = facade.create_place(place_data)
@@ -138,29 +138,25 @@ class PlaceResource(Resource):
     def get(self, place_id):
         """Get place details by ID"""
         place = facade.get_place(place_id)
+        owner = facade.get_user(place.owner_id)
         if place:
             return {
                 'id': place.id,
                 'title': place.title,
                 'description': place.description,
-                'price': place.price,
+                'price': str(place.price),
                 'latitude': place.latitude,
                 'longitude': place.longitude,
                 'owner': {
-                    'id': place.owner.id,
-                    'first_name': place.owner.first_name,
-                    'last_name': place.owner.last_name,
-                    'email': place.owner.email
-                    },
-                'amenities': [
-                    {
-                        'id': facade.get_place(place_id).id,
-                        'name': facade.get_amenity(amenity['id']).name
-                    }
-                    for amenity in place.amenities]}, 200
-        return {'error': 'Place not found'}, 404
+                    'id': owner.id,
+                    'first_name': owner.first_name,
+                    'last_name': owner.last_name,
+                    'email': owner.email
+                    }}, 200
+        # Add amenities in the future tasks
+        return {'error': 'Place not found.'}, 404
 
-    @api.expect(place_model, validate=True)
+    @api.expect(place_model)
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
@@ -170,27 +166,30 @@ class PlaceResource(Resource):
         """Update a place's information"""
         current_user = get_jwt_identity()
         place_data = api.payload
+        for key in place_data:
+            if key not in ['title', 'price', 'latitude', 'longitude', 'owner_id']:
+                return {'error': 'Invalid input data.'}, 400
 
         user = facade.get_user(place_data.get('owner_id'))
         if user is None:
-            return {'error': 'Invalid owner_id'}, 400
+            return {'error': 'Invalid owner_id.'}, 400
 
         if current_user['id'] != user.id:
-            return {'error': 'Unauthorized action'}, 403
+            return {'error': 'Unauthorized action.'}, 403
 
         if facade.get_place(place_id) is None:
-            return {'error': 'Place not found'}, 404
+            return {'error': 'Place not found.'}, 404
 
         if place_data == facade.get_place(place_id):
-            return {'error': 'Invalid input data'}, 400
+            return {'error': 'Invalid input data.'}, 400
 
         if place_data.get('amenities'):
             for amenity in place_data.get('amenities'):
                 if facade.get_amenity(amenity['id']) is None:
-                    return {'error': 'Invalid amenity ID'}, 400
+                    return {'error': 'Invalid amenity ID.'}, 400
 
         try:
             facade.update_place(place_id, place_data)
         except ValueError as e:
             return {'error': str(e)}, 400
-        return {'message': 'Place updated successfully'}, 200
+        return {'message': 'Place updated successfully.'}, 200
