@@ -1,4 +1,3 @@
-from flask import request
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -92,7 +91,6 @@ class PlaceList(Resource):
         """Register a new place"""
         current_user = get_jwt_identity()
         place_data = api.payload
-
         user = facade.get_user(place_data.get('owner_id'))
         if user is None:
             return {'error': 'Invalid owner_id'}, 400
@@ -100,8 +98,6 @@ class PlaceList(Resource):
         if current_user['id'] != user.id:
             return {'error': 'Unauthorized action'}, 403
 
-        del place_data['owner_id']
-        place_data['owner'] = user
         if place_data.get('amenities'):
             for amenity in place_data.get('amenities'):
                 if facade.get_amenity(amenity['id']) is None:
@@ -113,10 +109,10 @@ class PlaceList(Resource):
                 'id': place.id,
                 'title': place.title,
                 'description': place.description,
-                'price': place.price,
+                'price': str(place.price),
                 'latitude': place.latitude,
                 'longitude': place.longitude,
-                'owner_id': place.owner.id,
+                'owner_id': place.owner_id,
                 }, 201
         except ValueError as e:
             return {'error': str(e)}, 400
@@ -126,14 +122,12 @@ class PlaceList(Resource):
         """Retrieve a list of all places"""
         places = []
         for place in facade.get_all_places():
-            places.append(
-                {
-                    'id': place.id,
-                    'title': place.title,
-                    'latitude': place.latitude,
-                    'longitude': place.longitude
-                }
-                )
+            places.append({
+                'id': place.id,
+                'title': place.title,
+                'latitude': place.latitude,
+                'longitude': place.longitude
+                })
         return places, 200
 
 
@@ -163,9 +157,7 @@ class PlaceResource(Resource):
                         'id': facade.get_place(place_id).id,
                         'name': facade.get_amenity(amenity['id']).name
                     }
-                    for amenity in place.amenities
-                    ]
-                    }, 200
+                    for amenity in place.amenities]}, 200
         return {'error': 'Place not found'}, 404
 
     @api.expect(place_model, validate=True)
@@ -185,9 +177,6 @@ class PlaceResource(Resource):
 
         if current_user['id'] != user.id:
             return {'error': 'Unauthorized action'}, 403
-
-        del place_data['owner_id']
-        place_data['owner'] = user
 
         if facade.get_place(place_id) is None:
             return {'error': 'Place not found'}, 404

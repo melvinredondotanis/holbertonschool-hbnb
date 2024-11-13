@@ -1,4 +1,3 @@
-from flask import request
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -23,7 +22,6 @@ class AmenityList(Resource):
     def post(self):
         """Register a new amenity"""
         amenity_data = api.payload
-
         try:
             amenity = facade.create_amenity(amenity_data)
         except ValueError as e:
@@ -42,8 +40,7 @@ class AmenityList(Resource):
                 {
                     'id': amenity.id,
                     'name': amenity.name
-                }
-                )
+                })
         return amenities, 200
 
 
@@ -55,7 +52,7 @@ class AmenityResource(Resource):
         """Get amenity details by ID"""
         amenity = facade.get_amenity(amenity_id)
         if not amenity:
-            return {'error': 'Amenity not found'}, 404
+            return {'error': 'Amenity not found.'}, 404
         return {
             'id': amenity.id,
             'name': amenity.name
@@ -68,12 +65,11 @@ class AmenityResource(Resource):
     def put(self, amenity_id):
         """Update an amenity's information"""
         amenity_data = api.payload
-
         if facade.get_amenity(amenity_id) is None:
-            return {'error': 'Amenity not found'}, 404
+            return {'error': 'Amenity not found.'}, 404
 
         try:
             facade.update_amenity(amenity_id, amenity_data)
         except ValueError as e:
             return {'error': str(e)}, 400
-        return {'message': 'Amenity updated successfully'}, 200
+        return {'message': 'Amenity updated successfully.'}, 200
