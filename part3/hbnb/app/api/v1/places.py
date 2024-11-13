@@ -174,7 +174,8 @@ class PlaceResource(Resource):
         if user is None:
             return {'error': 'Invalid owner_id.'}, 400
 
-        if current_user['id'] != user.id:
+        is_admin = facade.get_user(current_user['id']).is_admin
+        if not is_admin and current_user['id'] != user.id:
             return {'error': 'Unauthorized action.'}, 403
 
         if facade.get_place(place_id) is None:
