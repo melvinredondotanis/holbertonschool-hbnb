@@ -31,9 +31,15 @@ class UserList(Resource):
     @api.expect(user_model, validate=True)
     @api.response(200, 'User successfully created')
     @api.response(400, 'Email already registered')
+    @api.response(403, 'Admin privileges required')
+    @jwt_required()
     def post(self):
         """Register a new user"""
+        current_user = get_jwt_identity()
         user_data = api.payload
+        if not current_user.get('is_admin', True):
+            return {'error': 'Admin privileges required.'}, 403
+
         if facade.get_user_by_email(user_data['email']):
             return {'error': 'Email already registered.'}, 400
 
@@ -89,6 +95,21 @@ class UserResource(Resource):
         """Update user details"""
         current_user = get_jwt_identity()
         user_data = api.payload
+        if current_user.get('is_admin', True):
+            for key in user_data:
+                if key not in ['first_name', 'last_name', 'email', 'password']:
+                    return {'error': 'Invalid input data.'}, 400
+
+            if user_data.get('email'):
+                if facade.get_user_by_email(user_data['email']):
+                    return {'error': 'Email already registered.'}, 400
+            
+            try:
+                facade.update_user(user_id, user_data)
+            except Exception as e:
+                return {'error': str(e)}, 400
+            return self.get(user_id)
+
         if user_data.get('email') or user_data.get('password'):
             return {'error': 'You cannot modify email or password.'}, 403
 
