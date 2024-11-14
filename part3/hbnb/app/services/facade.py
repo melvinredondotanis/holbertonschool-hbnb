@@ -52,6 +52,12 @@ class HBnBFacade:
         """
         self.user_repo.update(user_id, **user_data)
 
+    def delete_user(self, user_id):
+        """
+        Delete a user.
+        """
+        self.user_repo.delete(user_id)
+
     """
     Amenity methods
     """
@@ -81,6 +87,12 @@ class HBnBFacade:
         """
         return self.amenity_repo.update(amenity_id, **amenity_data)
 
+    def delete_amenity(self, amenity_id):
+        """
+        Delete an amenity.
+        """
+        return self.amenity_repo.delete(amenity_id)
+
     """
     Place methods
     """
@@ -109,6 +121,12 @@ class HBnBFacade:
         Update a place.
         """
         self.place_repo.update(place_id, **place_data)
+
+    def delete_place(self, place_id):
+        """
+        Delete a place.
+        """
+        self.place_repo.delete(place_id)
 
     """
     Review methods
