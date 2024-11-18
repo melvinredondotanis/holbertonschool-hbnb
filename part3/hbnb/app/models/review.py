@@ -59,7 +59,7 @@ class Review(BaseModel):
         """
         Get the place.
         """
-        return self._place
+        return self._place_id
 
     @place_id.setter
     def place_id(self, value):
@@ -70,7 +70,7 @@ class Review(BaseModel):
             raise ValueError(
                 'Place ID must be a string of 36 characters.'
             )
-        self._place = value
+        self._place_id = value
 
     @hybrid_property
     def user_id(self):

@@ -47,7 +47,7 @@ class ReviewList(Resource):
         if user is None:
             return {'error': 'Invalid user_id.'}, 400
 
-        if facade.get_reviews_by_place(user.id, place.id):
+        if user.id in [review.user_id for review in place.reviews]:
             return {'error': 'You have already reviewed this place.'}, 400
 
         if current_user['id'] != place.owner_id:
