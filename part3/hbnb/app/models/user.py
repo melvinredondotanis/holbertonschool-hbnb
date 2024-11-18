@@ -71,7 +71,9 @@ class User(BaseModel):
         """
         email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
         if not value or len(value) > 120:
-            raise ValueError('Email must be provided and be less than 120 characters.')
+            raise ValueError(
+                'Email must be provided and be less than 120 characters.'
+                )
         if not re.match(email_regex, value):
             raise ValueError('Invalid email format.')
         self._email = value
@@ -92,9 +94,9 @@ class User(BaseModel):
             raise ValueError('is_admin must be a boolean.')
         self._is_admin = value
 
-    def hash_password(self, password):
+    def hash_password(self, pwd):
         """Hashes the password before storing it."""
-        self._password = bcrypt.generate_password_hash(password).decode('utf-8')
+        self._password = bcrypt.generate_password_hash(pwd).decode('utf-8')
 
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
@@ -116,8 +118,4 @@ class User(BaseModel):
             raise ValueError('Password must be at least 8 characters.')
         if len(value) > 128:
             raise ValueError('Password must be less than 128 characters.')
-        if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$', value):
-            raise ValueError(
-                'Password must contain at least one uppercase letter, one lowercase letter, and one number.'
-                )
         self.hash_password(value)

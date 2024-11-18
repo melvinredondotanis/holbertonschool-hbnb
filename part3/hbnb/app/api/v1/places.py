@@ -167,7 +167,12 @@ class PlaceResource(Resource):
         current_user = get_jwt_identity()
         place_data = api.payload
         for key in place_data:
-            if key not in ['title', 'price', 'description', 'latitude', 'longitude', 'owner_id']:
+            if key not in ['title',
+                           'price',
+                           'description',
+                           'latitude',
+                           'longitude',
+                           'owner_id']:
                 return {'error': 'Invalid input data.'}, 400
 
         # Trust no one

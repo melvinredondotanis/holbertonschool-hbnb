@@ -100,7 +100,6 @@ class AmenityResource(Resource):
     @jwt_required()
     def delete(self, amenity_id):
         """Delete an amenity"""
-        
         current_user = get_jwt_identity()
         if current_user.get('is_admin', True):
             is_admin = facade.get_user(current_user['id']).is_admin

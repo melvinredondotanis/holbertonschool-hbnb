@@ -27,6 +27,7 @@ def create_default_admin():
     if not admin_exists:
         from config import DefaultAdmin
         admin = User(
+            id=DefaultAdmin.DEFAULT_HBNB_ADMIN_ID,
             first_name=DefaultAdmin.DEFAULT_HBNB_ADMIN_FIRST_NAME,
             last_name=DefaultAdmin.DEFAULT_HBNB_ADMIN_LAST_NAME,
             password=DefaultAdmin.DEFAULT_HBNB_ADMIN_PASSWORD,
@@ -35,6 +36,26 @@ def create_default_admin():
         )
         db.session.add(admin)
         db.session.commit()
+
+
+def create_default_amenities():
+    """
+    Create default amenities if they do not exist.
+    """
+    from app.models.amenity import Amenity
+
+    amenities = [
+        'WiFi',
+        'Swimming Pool',
+        'Air Conditioning'
+    ]
+
+    for amenity in amenities:
+        amenity_exists = Amenity.query.filter_by(name=amenity).first()
+        if not amenity_exists:
+            new_amenity = Amenity(name=amenity)
+            db.session.add(new_amenity)
+            db.session.commit()
 
 
 def create_app(config_class=config.DevelopmentConfig):
@@ -73,5 +94,6 @@ def create_app(config_class=config.DevelopmentConfig):
     with app.app_context():
         db.create_all()
         create_default_admin()
+        create_default_amenities()
 
     return app
