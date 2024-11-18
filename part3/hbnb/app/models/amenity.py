@@ -2,6 +2,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from app import db
 from app.models.base import BaseModel
+from app.models.place import place_amenity
 
 
 class Amenity(BaseModel):
@@ -12,6 +13,10 @@ class Amenity(BaseModel):
     __tablename__ = 'amenities'
 
     _name = db.Column(db.String(128), nullable=False)
+    places = db.relationship('Place',
+                           secondary=place_amenity,
+                           back_populates='amenities',
+                           lazy='dynamic')
 
     @hybrid_property
     def name(self):

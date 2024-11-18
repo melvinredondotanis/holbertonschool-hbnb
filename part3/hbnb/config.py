@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+from dotenv import load_dotenv
 
 
 class DefaultAdmin:
@@ -13,6 +14,7 @@ class DefaultAdmin:
 
 
 class Config:
+    load_dotenv()
     DEBUG = False
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'xXx_im_the_best_developer_xXx')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)

@@ -4,6 +4,18 @@ from app import db
 from app.models.base import BaseModel
 
 
+place_amenity = db.Table('place_amenity',
+    db.Column('place_id',
+              db.String(36),
+              db.ForeignKey('places.id'),
+              primary_key=True),
+    db.Column('amenity_id',
+              db.String(36),
+              db.ForeignKey('amenities.id'),
+              primary_key=True)
+)
+
+
 class Place(BaseModel):
     """
     Class representing a place.
@@ -17,6 +29,12 @@ class Place(BaseModel):
     _latitude = db.Column(db.Float, nullable=False)
     _longitude = db.Column(db.Float, nullable=False)
     _owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    owner = db.relationship('User', back_populates='places')
+    reviews = db.relationship('Review', back_populates='place', lazy='dynamic')
+    amenities = db.relationship('Amenity', 
+                              secondary=place_amenity,
+                              back_populates='places',
+                              lazy='dynamic')
 
     @hybrid_property
     def title(self):
