@@ -37,12 +37,15 @@ class Place(BaseModel):
                           db.ForeignKey('users.id'),
                           nullable=False)
     owner = db.relationship('User', back_populates='places')
-    reviews = db.relationship('Review', back_populates='place', lazy='dynamic')
+    reviews = db.relationship('Review',
+                              back_populates='place',
+                              cascade='all, delete-orphan')
     amenities = db.relationship(
         'Amenity',
         secondary=place_amenity,
         back_populates='places',
-        lazy='dynamic')
+        cascade='all, delete'
+    )
 
     @hybrid_property
     def title(self):

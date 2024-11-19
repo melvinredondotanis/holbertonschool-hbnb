@@ -15,8 +15,7 @@ class Amenity(BaseModel):
     _name = db.Column(db.String(128), nullable=False)
     places = db.relationship('Place',
                              secondary=place_amenity,
-                             back_populates='amenities',
-                             lazy='dynamic')
+                             back_populates='amenities')
 
     @hybrid_property
     def name(self):
