@@ -55,7 +55,6 @@ class ReviewList(Resource):
 
         try:
             review = facade.create_review(review_data)
-            place.add_review(review.id)
             return {
                 "id": review.id,
                 "text": review.text,
