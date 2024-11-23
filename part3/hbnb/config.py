@@ -3,14 +3,6 @@ from datetime import timedelta
 from dotenv import load_dotenv
 
 
-class DefaultAdmin:
-    DEFAULT_HBNB_ADMIN_ID = '36c9050e-ddd3-4c3b-9731-9f487208bbc1'
-    DEFAULT_HBNB_ADMIN_FIRST_NAME = 'Admin'
-    DEFAULT_HBNB_ADMIN_LAST_NAME = 'HBnB'
-    DEFAULT_HBNB_ADMIN_PASSWORD = 'admin1234'
-    DEFAULT_HBNB_ADMIN_EMAIL = 'admin@hbnb.io'
-
-
 class Config:
     load_dotenv()
     DEBUG = False
@@ -30,5 +22,4 @@ class DevelopmentConfig(Config):
 config = {
     'development': DevelopmentConfig,
     'default': DevelopmentConfig,
-    'admin': DefaultAdmin
 }

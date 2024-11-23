@@ -17,47 +17,6 @@ from app.api.v1.places import api as places_ns
 from app.api.v1.reviews import api as reviews_ns
 
 
-def create_default_admin():
-    """
-    Create a default admin user if it does not exist.
-    """
-    from app.models.user import User
-
-    admin_exists = User.query.filter_by(is_admin=True).first()
-    if not admin_exists:
-        from config import DefaultAdmin
-        admin = User(
-            id=DefaultAdmin.DEFAULT_HBNB_ADMIN_ID,
-            first_name=DefaultAdmin.DEFAULT_HBNB_ADMIN_FIRST_NAME,
-            last_name=DefaultAdmin.DEFAULT_HBNB_ADMIN_LAST_NAME,
-            password=DefaultAdmin.DEFAULT_HBNB_ADMIN_PASSWORD,
-            email=DefaultAdmin.DEFAULT_HBNB_ADMIN_EMAIL,
-            is_admin=True
-        )
-        db.session.add(admin)
-        db.session.commit()
-
-
-def create_default_amenities():
-    """
-    Create default amenities if they do not exist.
-    """
-    from app.models.amenity import Amenity
-
-    amenities = [
-        'WiFi',
-        'Swimming Pool',
-        'Air Conditioning'
-    ]
-
-    for amenity in amenities:
-        amenity_exists = Amenity.query.filter_by(name=amenity).first()
-        if not amenity_exists:
-            new_amenity = Amenity(name=amenity)
-            db.session.add(new_amenity)
-            db.session.commit()
-
-
 def create_app(config_class=config.DevelopmentConfig):
     """
     Create and configure the Flask application.
@@ -93,7 +52,5 @@ def create_app(config_class=config.DevelopmentConfig):
 
     with app.app_context():
         db.create_all()
-        create_default_admin()
-        create_default_amenities()
 
     return app

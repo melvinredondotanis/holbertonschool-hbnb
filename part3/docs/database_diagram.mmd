@@ -31,7 +31,14 @@ erDiagram
         string name
     }
 
+    Place_Amenity {
+        string place_id PK,FK
+        string amenity_id PK,FK
+    }
+
     User ||--o{ Place : "owns"
     User ||--o{ Review : "writes"
     Place ||--o{ Review : "has"
     Place }o--o{ Amenity : "has"
+    Place ||--o{ Place_Amenity : "includes"
+    Amenity ||--o{ Place_Amenity : "is included in"

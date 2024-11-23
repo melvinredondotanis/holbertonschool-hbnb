@@ -13,10 +13,10 @@ class User(BaseModel):
 
     __tablename__ = 'users'
 
-    _first_name = db.Column(db.String(50), nullable=False)
-    _last_name = db.Column(db.String(50), nullable=False)
-    _email = db.Column(db.String(120), nullable=False, unique=True)
-    _password = db.Column(db.String(128), nullable=False)
+    _first_name = db.Column(db.String(255), nullable=False)
+    _last_name = db.Column(db.String(255), nullable=False)
+    _email = db.Column(db.String(255), nullable=False, unique=True)
+    _password = db.Column(db.String(255), nullable=False)
     _is_admin = db.Column(db.Boolean, default=False)
     places = db.relationship('Place',
                              back_populates='owner',
@@ -37,9 +37,9 @@ class User(BaseModel):
         """
         Set the user's first name.
         """
-        if not value or len(value) > 50 or len(value) < 1:
+        if not value or len(value) > 255 or len(value) < 1:
             raise ValueError(
-                'First name must be provided and be less than 50 characters.'
+                'First name must be provided and be less than 255 characters.'
                 )
         self._first_name = value
 
@@ -55,9 +55,9 @@ class User(BaseModel):
         """
         Set the user's last name.
         """
-        if not value or len(value) > 50 or len(value) < 1:
+        if not value or len(value) > 255 or len(value) < 1:
             raise ValueError(
-                'Last name must be provided and be less than 50 characters.'
+                'Last name must be provided and be less than 255 characters.'
                 )
         self._last_name = value
 
@@ -74,9 +74,9 @@ class User(BaseModel):
         Set the user's email.
         """
         email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-        if not value or len(value) > 120:
+        if not value or len(value) > 255:
             raise ValueError(
-                'Email must be provided and be less than 120 characters.'
+                'Email must be provided and be less than 255 characters.'
                 )
         if not re.match(email_regex, value):
             raise ValueError('Invalid email format.')
@@ -120,6 +120,6 @@ class User(BaseModel):
         """
         if not value or len(value) < 8:
             raise ValueError('Password must be at least 8 characters.')
-        if len(value) > 128:
-            raise ValueError('Password must be less than 128 characters.')
+        if len(value) > 255:
+            raise ValueError('Password must be less than 255 characters.')
         self.hash_password(value)

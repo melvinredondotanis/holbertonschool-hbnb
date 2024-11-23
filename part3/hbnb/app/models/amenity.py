@@ -12,7 +12,7 @@ class Amenity(BaseModel):
 
     __tablename__ = 'amenities'
 
-    _name = db.Column(db.String(128), nullable=False)
+    _name = db.Column(db.String(255), nullable=False)
     places = db.relationship('Place',
                              secondary=place_amenity,
                              back_populates='amenities')
@@ -29,8 +29,8 @@ class Amenity(BaseModel):
         """
         Set the amenity name.
         """
-        if not value or len(value) > 128:
+        if not value or len(value) > 255:
             raise ValueError(
-                'Name must be provided and be less than 128 characters.'
+                'Name must be provided and be less than 255 characters.'
                 )
         self._name = value
