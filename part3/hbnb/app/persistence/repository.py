@@ -128,6 +128,7 @@ class UserRepository(SQLAlchemyRepository):
         """
         return self.model.query.filter_by(email=email).first()
 
+
 class PlaceRepository(SQLAlchemyRepository):
     """
     Repository for Place objects.

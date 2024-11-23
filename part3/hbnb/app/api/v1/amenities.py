@@ -24,7 +24,7 @@ class AmenityList(Resource):
         """Register a new amenity"""
         # Trust no one
         current_user = get_jwt_identity()
-        if current_user.get('is_admin', True):
+        if current_user.get('is_admin') is True:
             is_admin = facade.get_user(current_user['id']).is_admin
             if not is_admin:
                 return {'error': 'Admin privileges required.'}, 403
@@ -77,7 +77,7 @@ class AmenityResource(Resource):
     def put(self, amenity_id):
         """Update an amenity's information"""
         current_user = get_jwt_identity()
-        if current_user.get('is_admin', True):
+        if current_user.get('is_admin') is True:
             is_admin = facade.get_user(current_user['id']).is_admin
             if not is_admin:
                 return {'error': 'Admin privileges required.'}, 403
@@ -101,7 +101,7 @@ class AmenityResource(Resource):
     def delete(self, amenity_id):
         """Delete an amenity"""
         current_user = get_jwt_identity()
-        if current_user.get('is_admin', True):
+        if current_user.get('is_admin') is True:
             is_admin = facade.get_user(current_user['id']).is_admin
             if not is_admin:
                 return {'error': 'Admin privileges required.'}, 403

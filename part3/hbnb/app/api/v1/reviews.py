@@ -36,8 +36,13 @@ class ReviewList(Resource):
         """Register a new review"""
         current_user = get_jwt_identity()
         review_data = api.payload
-        if current_user['id'] != review_data['user_id']:
-            return {'error': 'You cannot review your own place.'}, 400
+        if current_user.get('is_admin') is True:
+            is_admin = facade.get_user(current_user['id']).is_admin
+            if not is_admin:
+                return {'error': 'Admin privileges required.'}, 403
+        else:
+            if current_user['id'] != review_data['user_id']:
+                return {'error': 'You cannot review your own place.'}, 400
 
         place = facade.get_place(review_data['place_id'])
         if place is None:
@@ -115,7 +120,7 @@ class ReviewResource(Resource):
         if review.owner_id != current_user['id']:
             return {'error': 'Unauthorized action.'}, 403
 
-        if review_data == facade.get_review(review_id):
+        if review_data is facade.get_review(review_id):
             return {'error': 'Invalid input data.'}, 400
 
         try:
@@ -129,9 +134,14 @@ class ReviewResource(Resource):
     @jwt_required()
     def delete(self, review_id):
         """Delete a review"""
+        # Trust no one
         current_user = get_jwt_identity()
-        if current_user['id'] != facade.get_review(review_id).user.id:
-            return {'error': 'Unauthorized action.'}, 403
+        if current_user.get('is_admin') is True:
+            is_admin = facade.get_user(current_user['id']).is_admin
+            if not is_admin:
+                return {'error': 'Admin privileges required.'}, 403
+        else:
+            return {'error': 'Admin privileges required.'}, 403
 
         if facade.get_review(review_id):
             place = facade.get_place(review_id)

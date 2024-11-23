@@ -140,7 +140,7 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         owner = facade.get_user(place.owner_id)
         if place:
-            return {
+            {
                 'id': place.id,
                 'title': place.title,
                 'description': place.description,
@@ -152,8 +152,14 @@ class PlaceResource(Resource):
                     'first_name': owner.first_name,
                     'last_name': owner.last_name,
                     'email': owner.email
-                    }}, 200
-        # Add amenities in the future tasks
+                },
+                'amenities': [
+                    {
+                        'id': amenity.id,
+                        'name': amenity.name
+                    } for amenity in place.amenities
+                ]
+            }, 200
         return {'error': 'Place not found.'}, 404
 
     @api.expect(place_model)
@@ -176,7 +182,7 @@ class PlaceResource(Resource):
                 return {'error': 'Invalid input data.'}, 400
 
         # Trust no one
-        if current_user.get('is_admin', True):
+        if current_user.get('is_admin') is True:
             is_admin = facade.get_user(current_user['id']).is_admin
             if not is_admin:
                 return {'error': 'Admin privileges required.'}, 403
@@ -192,7 +198,7 @@ class PlaceResource(Resource):
             if facade.get_place(place_id) is None:
                 return {'error': 'Place not found.'}, 404
 
-            if place_data == facade.get_place(place_id):
+            if place_data is facade.get_place(place_id):
                 return {'error': 'Invalid input data.'}, 400
 
             if place_data.get('amenities'):
@@ -212,7 +218,15 @@ class PlaceResource(Resource):
     @jwt_required()
     def delete(self, place_id):
         """Delete a place"""
+        # Trust no one
         current_user = get_jwt_identity()
+        if current_user.get('is_admin') is True:
+            is_admin = facade.get_user(current_user['id']).is_admin
+            if not is_admin:
+                return {'error': 'Admin privileges required.'}, 403
+        else:
+            return {'error': 'Admin privileges required.'}, 403
+
         place = facade.get_place(place_id)
         if place is None:
             return {'error': 'Place not found.'}, 404
