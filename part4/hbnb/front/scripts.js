@@ -1,12 +1,61 @@
-// Initialize the API URL
 const host = 'localhost';
 const port = '5000';
 
 
-// API URL for the login endpoint
-const login = 'http://' + host + ':' + port + '/api/v1/auth/login';
-async function login_user(email, password)
+function getCookie(name)
 {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies)
+  {
+    const [cookie_name, cookie_value] = cookie.split('=');
+    if (cookie_name.trim() === name)
+      return cookie_value;
+  }
+  return null;
+}
+
+
+async function fetchPlaces(token)
+{
+  // Make a GET request to fetch places data
+  // Include the token in the Authorization header
+  // Handle the response and pass the data to displayPlaces function
+}
+
+
+function checkAuthentication()
+{
+  const token = getCookie('token');
+  const loginLink = document.getElementById('login-link');
+
+  if (!token)
+  {
+    loginLink.style.display = 'block';
+  }
+  else 
+  {
+    loginLink.style.display = 'none';
+    fetchPlaces(token);
+  }
+}
+
+
+function displayPlaces(places) {
+  // Clear the current content of the places list
+  // Iterate over the places data
+  // For each place, create a div element and set its content
+  // Append the created element to the places list
+}
+
+
+document.getElementById('price-filter').addEventListener('change', (event) => {
+  // Get the selected price value
+  // Iterate over the places and show/hide them based on the selected price
+});
+
+
+const login = 'http://' + host + ':' + port + '/api/v1/auth/login';
+async function login_user(email, password) {
   const login_data = {
     'email': email,
     'password': password
