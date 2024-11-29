@@ -83,27 +83,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-
-function displayPlaces(places) {
-  const placesList = document.getElementById('places-list');
-  placesList.innerHTML = ''; // vide la liste des anciennes places
-
-  // pour chaque place ca cree element HTML
-  places.forEach(place => {
-    // carte pour chaque place
-    const placeCard = document.createElement('div');
-    placeCard.classList.add('cards', 'place-card');
-
-    // contenu HTML a inserer dans la carte
-    const placeInfo = `
-      <p>${place.title}</p>
-      <p>Price per night: $${place.price}</p>
-      <a href="place.html?id=${place.id}" class="button login_button">View Details</a>
-    `;
-    
-    placeCard.innerHTML = placeInfo;
-
-    // ajoute la carte au conteneur de la liste
-    placesList.appendChild(placeCard);
-  });
-}
