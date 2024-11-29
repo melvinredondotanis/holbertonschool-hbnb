@@ -35,11 +35,16 @@ window.addEventListener('load', () => {
 function checkAuthentication() {
   const token = getCookie('hbnb_token');
   const loginLink = document.getElementById('login-link');
+  const placesList = document.getElementById('places-list');
 
-  if (!token) {
-    loginLink.style.display = 'block';
-  } else {
-    loginLink.style.display = 'none';
+  if (loginLink) {
+    if (!token) {
+      loginLink.style.display = 'block';
+    } else {
+      loginLink.style.display = 'none';
+    }
+  }
+  if (placesList) {
     fetchPlaces();
   }
 }
@@ -86,10 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchPlaces() {
-  fetch("http://127.0.0.1:5000/api/v1/places/")
+  fetch(`${apiUrl}/places`)
     .then((response) => {
       if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des données");
+        throw new Error('Network response was not ok');
       }
       return response.json();
     })
@@ -97,21 +102,17 @@ async function fetchPlaces() {
       displayPlaces(data);
     })
     .catch((error) => {
-      console.error("Erreur :", error);
+      console.error('Error: ', error);
     });
 }
 
 function displayPlaces(places) {
   const placesList = document.getElementById('places-list');
-  placesList.innerHTML = ''; // vide la liste des anciennes places
+  placesList.innerHTML = '';
 
-  // pour chaque place ca cree element HTML
   places.forEach(place => {
-    // carte pour chaque place
     const placeCard = document.createElement('div');
     placeCard.classList.add('place-card');
-
-    // contenu HTML a inserer dans la carte
     const placeInfo = `
       <div class="place-info">
           <h2>${place.title}</h2>
@@ -119,10 +120,7 @@ function displayPlaces(places) {
       </div>
       <a href="place.html?id=${place.id}"><button class="details-button">View Details</button></a>
     `;
-
     placeCard.innerHTML = placeInfo;
-
-    // ajoute la carte au conteneur de la liste
     placesList.appendChild(placeCard);
   });
 }
