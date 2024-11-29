@@ -56,42 +56,43 @@ def create_app(config_class=config.DevelopmentConfig):
 
     with app.app_context():
         db.create_all()
-        admin = User.query.filter_by(email='admin@hbnb.com').first()
-        if not admin:
-            admin = User(
-                id='36c9050e-ddd3-4c3b-9731-9f487208bbc1',
-                _first_name='Admin',
-                _last_name='HBnB',
-                _email='admin@hbnb.io',
-                _password='$2b$12$yPzwR02tJub1wfuWcCoZ8eL8aK6a2nz5SAeU9KVS7m//K48OuemVW',
-                _is_admin=True
-            )
-            db.session.merge(admin)
-
-            wifi = Amenity.query.filter_by(id='ad6cbba4-33c9-48e3-b6ee-d494ee5a6b45').first()
-            if not wifi:
-                wifi = Amenity(
-                id='ad6cbba4-33c9-48e3-b6ee-d494ee5a6b45',
-                _name='WiFi'
+        if config.Config.DEV_MODE:
+            admin = User.query.filter_by(email='admin@hbnb.com').first()
+            if not admin:
+                admin = User(
+                    id='36c9050e-ddd3-4c3b-9731-9f487208bbc1',
+                    _first_name='Admin',
+                    _last_name='HBnB',
+                    _email='admin@hbnb.io',
+                    _password='$2b$12$yPzwR02tJub1wfuWcCoZ8eL8aK6a2nz5SAeU9KVS7m//K48OuemVW',
+                    _is_admin=True
                 )
-                db.session.merge(wifi)
+                db.session.merge(admin)
 
-            pool = Amenity.query.filter_by(id='ad6cbba4-33c9-48e3-b6ee-d494ee5a6b46').first()
-            if not pool:
-                pool = Amenity(
-                id='ad6cbba4-33c9-48e3-b6ee-d494ee5a6b46',
-                _name='Swimming Pool'
-                )
-                db.session.merge(pool)
+                wifi = Amenity.query.filter_by(id='ad6cbba4-33c9-48e3-b6ee-d494ee5a6b45').first()
+                if not wifi:
+                    wifi = Amenity(
+                    id='ad6cbba4-33c9-48e3-b6ee-d494ee5a6b45',
+                    _name='WiFi'
+                    )
+                    db.session.merge(wifi)
 
-            ac = Amenity.query.filter_by(id='0b8744c5-5c58-4c4a-8467-48392e306e28').first()
-            if not ac:
-                ac = Amenity(
-                id='0b8744c5-5c58-4c4a-8467-48392e306e28',
-                _name='Air Conditioning'
-                )
-                db.session.merge(ac)
-                
-            db.session.commit()
+                pool = Amenity.query.filter_by(id='ad6cbba4-33c9-48e3-b6ee-d494ee5a6b46').first()
+                if not pool:
+                    pool = Amenity(
+                    id='ad6cbba4-33c9-48e3-b6ee-d494ee5a6b46',
+                    _name='Swimming Pool'
+                    )
+                    db.session.merge(pool)
+
+                ac = Amenity.query.filter_by(id='0b8744c5-5c58-4c4a-8467-48392e306e28').first()
+                if not ac:
+                    ac = Amenity(
+                    id='0b8744c5-5c58-4c4a-8467-48392e306e28',
+                    _name='Air Conditioning'
+                    )
+                    db.session.merge(ac)
+
+                db.session.commit()
 
     return app

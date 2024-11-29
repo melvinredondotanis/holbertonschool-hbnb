@@ -1,4 +1,3 @@
-const frontPath = '/part4/hbnb/front/';
 const API_CONFIG = {
     host: 'http://localhost',
     port: '5000',
@@ -29,12 +28,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-window.addEventListener('DOMContentLoaded', () => {
-  if ((window.location.pathname.includes('index.html') || window.location.pathname === frontPath) && !getCookie('hbnb_token')) {
-    window.location.href = 'login.html';
-  }
-});
-
 window.addEventListener('load', () => {
   checkAuthentication()
 });
@@ -47,7 +40,7 @@ function checkAuthentication() {
     loginLink.style.display = 'block';
   } else {
     loginLink.style.display = 'none';
-    displayPlaces(token);
+    fetchPlaces();
   }
 }
 
@@ -91,3 +84,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+async function fetchPlaces() {
+  fetch("http://127.0.0.1:5000/api/v1/places/")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Erreur lors de la récupération des données");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      displayPlaces(data);
+    })
+    .catch((error) => {
+      console.error("Erreur :", error);
+    });
+}
+
+function displayPlaces(places) {
+  const placesList = document.getElementById('places-list');
+  placesList.innerHTML = ''; // vide la liste des anciennes places
+
+  // pour chaque place ca cree element HTML
+  places.forEach(place => {
+    // carte pour chaque place
+    const placeCard = document.createElement('div');
+    placeCard.classList.add('place-card');
+
+    // contenu HTML a inserer dans la carte
+    const placeInfo = `
+      <div class="place-info">
+          <h2>${place.title}</h2>
+          <p>Price per night: $${place.price}</p>
+      </div>
+      <a href="place.html?id=${place.id}"><button class="details-button">View Details</button></a>
+    `;
+
+    placeCard.innerHTML = placeInfo;
+
+    // ajoute la carte au conteneur de la liste
+    placesList.appendChild(placeCard);
+  });
+}

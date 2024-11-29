@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 class Config:
     load_dotenv()
     DEBUG = False
+    DEV_MODE = False
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY',
                                'xXx_im_the_best_developer_xXx')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
