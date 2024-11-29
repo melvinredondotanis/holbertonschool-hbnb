@@ -1,104 +1,79 @@
-const host = 'localhost';
-const port = '5000';
+const API_CONFIG = {
+    host: 'http://localhost',
+    port: '5000',
+    version: 'v1'
+};
+const apiUrl = `${API_CONFIG.host}:${API_CONFIG.port}/api/${API_CONFIG.version}`;
 
 
-function getCookie(name)
-{
+function setCookie(name, value, days) {
+  const date = new Date();
+  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+  const expires = `expires=${date.toUTCString()}`;
+  document.cookie = `${name}=${value}; ${expires}; path=/; domain=${window.location.hostname}`;
+}
+
+function getCookie(name) {
   const cookies = document.cookie.split(';');
-  for (let cookie of cookies)
-  {
-    const [cookie_name, cookie_value] = cookie.split('=');
-    if (cookie_name.trim() === name)
-      return cookie_value;
+  for (const cookie of cookies) {
+    const [key, value] = cookie.trim().split('=');
+    if (key === name) return value;
   }
   return null;
 }
 
-
-async function fetchPlaces(token)
-{
-  // Make a GET request to fetch places data
-  // Include the token in the Authorization header
-  // Handle the response and pass the data to displayPlaces function
-}
-
-
-function checkAuthentication()
-{
-  const token = getCookie('token');
-  const loginLink = document.getElementById('login-link');
-
-  if (!token)
-  {
-    loginLink.style.display = 'block';
-  }
-  else 
-  {
-    loginLink.style.display = 'none';
-    fetchPlaces(token);
-  }
-}
-
-
-function displayPlaces(places) {
-  // Clear the current content of the places list
-  // Iterate over the places data
-  // For each place, create a div element and set its content
-  // Append the created element to the places list
-}
-
-
-document.getElementById('price-filter').addEventListener('change', (event) => {
-  // Get the selected price value
-  // Iterate over the places and show/hide them based on the selected price
+window.addEventListener('load', () => {
+  checkAuthentication()
 });
 
+function checkAuthentication() {
+  const token = getCookie('hbnb_token');
+  const loginLink = document.getElementById('login-link');
 
-const login = 'http://' + host + ':' + port + '/api/v1/auth/login';
-async function login_user(email, password) {
-  const login_data = {
-    'email': email,
-    'password': password
-  };
-
-  const response = await fetch(login, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(login_data)
-  });
-
-  return response;
+  if (!token) {
+    loginLink.style.display = 'block';
+  } else {
+    loginLink.style.display = 'none';
+  }
 }
 
+function validateInput(password) {
+  if (!password || password.length < 6) {
+    throw new Error('Password too short');
+  }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
 
-  if (loginForm)
-  {
+  if (loginForm) {
     loginForm.addEventListener('submit', async (event) => {
       event.preventDefault();
-      
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      
-      if (!email || !password)
-      {
-        alert('Email and password are required');
-        return;
-      }
 
-      const response = await login_user(email, password);
-      if (response.ok)
-      {
-        const data = await response.json();
-        document.cookie = `token=${data.access_token}; path=/`;
-        window.location.href = 'index.html';
+      const email = loginForm.querySelector('[name="email"]').value;
+      const password = loginForm.querySelector('[name="password"]').value;
+
+      try {
+        validateInput(password);
+        const response = await fetch(`${apiUrl}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCookie('hbnb_token', data.access_token, 1);
+          window.location.href = 'index.html';
+        } else {
+          const error = await response.json();
+          alert('Login failed: ' + (error.message || response.statusText));
+        }
+      } catch (error) {
+        alert('Login failed: ' + error.message);
       }
-      else
-        alert('Login failed: ' + response.statusText);
     });
   }
 });
