@@ -124,3 +124,28 @@ function displayPlaces(places) {
     placesList.appendChild(placeCard);
   });
 }
+
+const priceFilter = document.getElementById('price-filter');
+const options = ['All', '$10', '$50', '$100'];
+
+options.forEach(option => {
+  const opt = document.createElement('option');
+  opt.value = option === 'All' ? '' : parseInt(option.replace('$', ''));
+  opt.textContent = option;
+  priceFilter.appendChild(opt);
+});
+
+priceFilter.addEventListener('change', (event) => {
+  const selectedPrice = event.target.value ? parseInt(event.target.value) : Infinity;
+  const placeCards = document.querySelectorAll('.place-card');
+
+  placeCards.forEach(card => {
+    const priceText = card.querySelector('.place-info p').textContent;
+    const price = parseInt(priceText.replace('Price per night: $', ''));
+    if (price <= selectedPrice) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+});
