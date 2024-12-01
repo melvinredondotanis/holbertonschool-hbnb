@@ -32,11 +32,10 @@ window.addEventListener('load', () => {
   checkAuthentication()
 });
 
-function checkAuthentication() {
+async function checkAuthentication() {
   const token = getCookie('hbnb_token');
-  const loginLink = document.getElementById('login-link');
-  const placesList = document.getElementById('places-list');
 
+  const loginLink = document.getElementById('login-link');
   if (loginLink) {
     if (!token) {
       loginLink.style.display = 'block';
@@ -44,8 +43,19 @@ function checkAuthentication() {
       loginLink.style.display = 'none';
     }
   }
+  const placesList = document.getElementById('places-list');
   if (placesList) {
     fetchPlaces();
+  }
+
+  const addReviewForm = document.querySelector('#add-review-form');
+  if (addReviewForm) {
+    addReviewForm.style.display = token ? 'block' : 'none';
+  }
+
+  const placeId = getPlaceIdFromURL();
+  if (placeId) {
+    await fetchPlaceDetails(placeId, token);
   }
 }
 
@@ -91,19 +101,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchPlaces() {
-  fetch(`${apiUrl}/places`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then((data) => {
-      displayPlaces(data);
-    })
-    .catch((error) => {
-      console.error('Error: ', error);
-    });
+  try {
+    const response = await fetch(`${apiUrl}/places`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    displayPlaces(data);
+  } catch (error) {
+    console.error('Error: ', error);
+  }
 }
 
 function displayPlaces(places) {
@@ -126,26 +133,123 @@ function displayPlaces(places) {
 }
 
 const priceFilter = document.getElementById('price-filter');
-const options = ['All', '$10', '$50', '$100'];
+if (priceFilter) {
+  const options = ['All', '$10', '$50', '$100'];
 
-options.forEach(option => {
-  const opt = document.createElement('option');
-  opt.value = option === 'All' ? '' : parseInt(option.replace('$', ''));
-  opt.textContent = option;
-  priceFilter.appendChild(opt);
-});
-
-priceFilter.addEventListener('change', (event) => {
-  const selectedPrice = event.target.value ? parseInt(event.target.value) : Infinity;
-  const placeCards = document.querySelectorAll('.place-card');
-
-  placeCards.forEach(card => {
-    const priceText = card.querySelector('.place-info p').textContent;
-    const price = parseInt(priceText.replace('Price per night: $', ''));
-    if (price <= selectedPrice) {
-      card.style.display = 'block';
-    } else {
-      card.style.display = 'none';
-    }
+  options.forEach(option => {
+    const opt = document.createElement('option');
+    opt.value = option === 'All' ? '' : parseInt(option.replace('$', ''));
+    opt.textContent = option;
+    priceFilter.appendChild(opt);
   });
+
+  priceFilter.addEventListener('change', (event) => {
+    const selectedPrice = event.target.value ? parseInt(event.target.value) : Infinity;
+    const placeCards = document.querySelectorAll('.place-card');
+
+    placeCards.forEach(card => {
+      const priceText = card.querySelector('.place-info p').textContent;
+      const price = parseInt(priceText.replace('Price per night: $', ''));
+      if (price <= selectedPrice) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+}
+
+function getPlaceIdFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('id');
+}
+
+async function fetchPlaceDetails(placeId, token) {
+  try {
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${apiUrl}/places/${placeId}`, {
+      method: 'GET',
+      headers: headers
+    });
+
+    if (response.status === 404) {
+      const placeDetails = document.querySelector('#place-details');
+      if (placeDetails) {
+        placeDetails.innerHTML = '<h1>Place not found</h1><p>The requested place does not exist.</p>';
+      }
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch place details');
+    }
+
+    const placeData = await response.json();
+    displayPlaceDetails(placeData);
+  } catch (error) {
+    console.error('Error:', error);
+    const placeDetails = document.querySelector('#place-details');
+    if (placeDetails) {
+      placeDetails.innerHTML = '<h1>Error</h1><p>Failed to load place details. Please try again later.</p>';
+    }
+  }
+}
+
+async function fetchUserName(userId) {
+  try {
+    const response = await fetch(`${apiUrl}/users/${userId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user details');
+    }
+    const userData = await response.json();
+    return userData.first_name + ' ' + userData.last_name;
+  } catch (error) {
+    console.error('Error:', error);
+    return 'Unknown User';
+  }
+}
+
+async function displayPlaceDetails(place) {
+  const placeDetails = document.querySelector('#place-details');
+  if (!placeDetails) return;
+
+  let html = `
+  <div class="details-card">
+    <h2>${place.title}</h2>
+    <p><b>Description:</b> ${place.description}</p>
+    <p><b>Host:</b> Latitude: ${place.latitude}, Longitude: ${place.longitude}</p>
+    <p><b>Price per night:</b> $${place.price}</p>
+    <p><b>Amenities:</b> ${place.amenities.map(amenity => amenity.name).join(', ')}</p>
+  </div>
+  `;
+
+  const reviewsHtml = place.reviews && place.reviews.length ? await Promise.all(place.reviews.map(async review => {
+    const userName = await fetchUserName(review.user_id);
+    return `
+      <div class="review-card">
+        <p><b>${userName}</b></p>
+        <p>${review.text}</p>
+        <p><b>Rate:</b> ${'★'.repeat(review.rating)}</p>
+      </div>
+    `;
+  })).then(reviews => reviews.join('')) : '<div class="review-card"><p><b>No reviews yet</b></p></div>';
+
+  html += reviewsHtml;
+
+  placeDetails.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const reviewForm = document.getElementById('review-form');
+  const token = getCookie('hbnb_token');
+
+  if (reviewForm) {
+    reviewForm.style.display = token ? 'block' : 'none';
+  }
 });

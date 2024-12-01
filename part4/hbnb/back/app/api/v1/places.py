@@ -141,7 +141,7 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         owner = facade.get_user(place.owner_id)
         if place:
-            {
+            return {
                 'id': place.id,
                 'title': place.title,
                 'description': place.description,
@@ -159,6 +159,14 @@ class PlaceResource(Resource):
                         'id': amenity.id,
                         'name': amenity.name
                     } for amenity in place.amenities
+                ],
+                'reviews': [
+                    {
+                        'id': review.id,
+                        'text': review.text,
+                        'rating': review.rating,
+                        'user_id': review.user_id
+                    } for review in place.reviews
                 ]
             }, 200
         return {'error': 'Place not found.'}, 404
