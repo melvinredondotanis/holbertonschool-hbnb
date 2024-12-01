@@ -139,9 +139,13 @@ class PlaceResource(Resource):
     def get(self, place_id):
         """Get place details by ID"""
         place = facade.get_place(place_id)
+        if place is None:
+            return {'error': 'Place not found.'}, 404
         owner = facade.get_user(place.owner_id)
-        if place:
-            return {
+        try:
+            if place is None:
+                return {'error': 'Place not found.'}, 404
+            response = {
                 'id': place.id,
                 'title': place.title,
                 'description': place.description,
@@ -169,7 +173,9 @@ class PlaceResource(Resource):
                     } for review in place.reviews
                 ]
             }, 200
-        return {'error': 'Place not found.'}, 404
+            return response
+        except Exception as e:
+            return {'error': str(e)}, 404
 
     @api.expect(place_model)
     @api.response(200, 'Place updated successfully')

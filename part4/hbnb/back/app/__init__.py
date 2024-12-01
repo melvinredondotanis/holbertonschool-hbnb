@@ -25,8 +25,8 @@ def create_app(config_class=config.DevelopmentConfig):
     Create and configure the Flask application.
     """
     app = Flask(__name__)
-    CORS(app)
     app.config.from_object(config_class)
+    CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]}})
     api = Api(
         app,
         version='1.0',

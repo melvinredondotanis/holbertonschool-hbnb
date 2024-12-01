@@ -1,5 +1,5 @@
 const API_CONFIG = {
-    host: 'http://localhost',
+    host: 'http://127.0.0.1',
     port: '5000',
     version: 'v1'
 };
@@ -20,6 +20,15 @@ function getCookie(name) {
     if (key === name) return value;
   }
   return null;
+}
+
+function parseJwt(token) {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+  return JSON.parse(jsonPayload);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -222,9 +231,9 @@ async function displayPlaceDetails(place) {
   let html = `
   <div class="details-card">
     <h2>${place.title}</h2>
-    <p><b>Description:</b> ${place.description}</p>
-    <p><b>Host:</b> Latitude: ${place.latitude}, Longitude: ${place.longitude}</p>
+    <p><b>Host:</b> ${place.owner.first_name + ' ' + place.owner.last_name}</p>
     <p><b>Price per night:</b> $${place.price}</p>
+    <p><b>Description:</b> ${place.description}</p>
     <p><b>Amenities:</b> ${place.amenities.map(amenity => amenity.name).join(', ')}</p>
   </div>
   `;
@@ -235,7 +244,7 @@ async function displayPlaceDetails(place) {
       <div class="review-card">
         <p><b>${userName}</b></p>
         <p>${review.text}</p>
-        <p><b>Rate:</b> ${'★'.repeat(review.rating)}</p>
+        <p><b>Rating:</b> ${'★'.repeat(review.rating)}</p>
       </div>
     `;
   })).then(reviews => reviews.join('')) : '<div class="review-card"><p><b>No reviews yet</b></p></div>';
@@ -251,5 +260,69 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (reviewForm) {
     reviewForm.style.display = token ? 'block' : 'none';
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const reviewForm = document.getElementById('review-form');
+  const token = getCookie('hbnb_token');
+
+  if (reviewForm) {
+    if (!token) {
+      reviewForm.style.display = 'none';
+      return;
+    }
+
+    const placeId = getPlaceIdFromURL();
+    if (!placeId) {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    reviewForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      
+      const reviewText = reviewForm.querySelector('#review').value;
+      const rating = reviewForm.querySelector('#rating').value;
+
+      try {
+        const response = await fetch(`${apiUrl}/reviews/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            text: reviewText,
+            rating: parseInt(rating),
+            user_id: parseJwt(token).sub.id,
+            place_id: placeId.toString()         
+          })
+        });
+
+        if (response.ok) {
+          const messageDiv = document.createElement('div');
+          messageDiv.className = 'success-message';
+          messageDiv.textContent = 'Review submitted successfully!';
+          reviewForm.insertBefore(messageDiv, reviewForm.firstChild);
+          
+          reviewForm.querySelector('#review').value = '';
+          reviewForm.querySelector('#rating').value = '';
+          
+          await fetchPlaceDetails(placeId, token);
+          
+          setTimeout(() => messageDiv.remove(), 3000);
+        } else {
+          throw new Error('Failed to submit review');
+        }
+      } catch (error) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'error-message';
+        messageDiv.textContent = error.message;
+        reviewForm.insertBefore(messageDiv, reviewForm.firstChild);
+        
+        setTimeout(() => messageDiv.remove(), 3000);
+      }
+    });
   }
 });
